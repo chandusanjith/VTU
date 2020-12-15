@@ -17,9 +17,12 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 from vtu import views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('apiv1/LoadMasterData/', views.FetchMasterList.as_view()),
     path('apiv1/Notes/<sem>/<branch>', views.SnippetList.as_view()),
-]
+]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)
