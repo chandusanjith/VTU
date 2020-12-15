@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MasterNotes, MasterBranches, MasterSemesters
+from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects
 
 
 class NotesSerializer(serializers.ModelSerializer):
@@ -7,6 +7,11 @@ class NotesSerializer(serializers.ModelSerializer):
         model = MasterNotes
         fields = '__all__'
         depth = 1
+
+class SubjectSerializer(serializers.ModelSerializer):
+  class Meta:
+      model = MasterSubjects
+      fields = '__all__'
 
 class BranchesSerilizer(serializers.ModelSerializer):
    class Meta:

@@ -16,10 +16,22 @@ class MasterBranches(models.Model):
   def __str__(self):
       return self.branch_name
 
+class MasterSubjects(models.Model):
+  subject_branch = models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='Branch_subject', null=True)
+  subject_semester = models.ForeignKey(MasterSemesters, on_delete=models.CASCADE, related_name='Semester_subject', null=True)
+  subject_code = models.CharField(max_length=10, unique=True)
+  subject_name = models.CharField(max_length=200, unique=True)
+  Description = models.CharField(max_length=200, default=" ")
+  Uploaded_on = models.DateField(auto_now_add=True)
+
+  def __str__(self):
+      return self.subject_name  
+
 class MasterNotes(models.Model):
   owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='Notes_owner')
   semester = models.ForeignKey(MasterSemesters, on_delete=models.CASCADE, related_name='Semester_owner', null=True)
   branch = models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='Branch_owner', null=True)
+  subject = models.ForeignKey(MasterSubjects, on_delete=models.CASCADE, related_name='Master_owner', null=True)
   file = models.FileField(blank=True, null=True)
   Description = models.CharField(max_length=200, default=" ")
   Uploaded_on = models.DateField(auto_now_add=True)
