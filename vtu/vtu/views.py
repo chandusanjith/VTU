@@ -12,6 +12,8 @@ from .models import MasterSemesters,MasterBranches,MasterNotes, MasterSubjects
 from .serializers import NotesSerializer, NotesMasterSerializer, SubjectSerializer
 from rest_framework import parsers
 from collections import namedtuple
+from pdf2jpg import pdf2jpg
+from django.contrib import admin
 
 
 class SnippetList(APIView):
@@ -22,7 +24,7 @@ class SnippetList(APIView):
   def get(self, request, sem, branch, subject, format=None):
     ws_semester = MasterSemesters.objects.filter(sem_name = sem).first()
     ws_branch = MasterBranches.objects.filter(branch_name = branch).first()
-    ws_subject = MasterSubjects.objects.filter(subject_code = subject).first()
+    ws_subject = MasterSubjects.objects.filter(subject_name = subject).first()
     Notes_raw = MasterNotes.objects.filter(semester = ws_semester, branch = ws_branch, subject = ws_subject)
     notes_serializer = NotesSerializer(Notes_raw, many=True)
     return Response(notes_serializer.data, status=status.HTTP_200_OK)
@@ -46,3 +48,4 @@ class FetchSubject(APIView):
     Sub_raw = MasterSubjects.objects.filter(subject_semester = ws_semester, subject_branch = ws_branch)
     sub_serializer = SubjectSerializer(Sub_raw, many=True)
     return Response(sub_serializer.data, status=status.HTTP_200_OK)
+
