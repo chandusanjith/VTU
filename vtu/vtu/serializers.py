@@ -5,8 +5,7 @@ from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects
 class NotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = MasterNotes
-        fields = '__all__'
-        depth = 1
+        fields = ('owner','file','Description')
 
 class SubjectSerializer(serializers.ModelSerializer):
   class Meta:
