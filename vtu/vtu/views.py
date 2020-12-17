@@ -12,7 +12,6 @@ from .models import MasterSemesters,MasterBranches,MasterNotes, MasterSubjects
 from .serializers import NotesSerializer, NotesMasterSerializer, SubjectSerializer
 from rest_framework import parsers
 from collections import namedtuple
-from pdf2jpg import pdf2jpg
 from django.contrib import admin
 
 
@@ -26,6 +25,8 @@ class SnippetList(APIView):
     ws_branch = MasterBranches.objects.filter(branch_name = branch).first()
     ws_subject = MasterSubjects.objects.filter(subject_name = subject).first()
     Notes_raw = MasterNotes.objects.filter(semester = ws_semester, branch = ws_branch, subject = ws_subject)
+    if not Notes_raw:
+      return Response({"ERROR":"404 NO DATA FOUND :("}, status=status.HTTP_404_NOT_FOUND)
     notes_serializer = NotesSerializer(Notes_raw, many=True)
     return Response(notes_serializer.data, status=status.HTTP_200_OK)
 
@@ -46,6 +47,7 @@ class FetchSubject(APIView):
     ws_semester = MasterSemesters.objects.filter(sem_name = sem).first()
     ws_branch = MasterBranches.objects.filter(branch_name = branch).first()
     Sub_raw = MasterSubjects.objects.filter(subject_semester = ws_semester, subject_branch = ws_branch)
+    if not Sub_raw:
+      return Response({"ERROR":"404 NO DATA FOUND :("}, status=status.HTTP_404_NOT_FOUND)
     sub_serializer = SubjectSerializer(Sub_raw, many=True)
     return Response(sub_serializer.data, status=status.HTTP_200_OK)
-
