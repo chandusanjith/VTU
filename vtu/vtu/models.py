@@ -37,3 +37,20 @@ class MasterNotes(models.Model):
   file_snippet = models.FileField(blank=True, null=True)
   Description = models.CharField(max_length=200, default=" ")
   Uploaded_on = models.DateField(auto_now_add=True)
+
+  def __str__(self):
+      return self.Description 
+
+
+class MasterQuestionPapers(models.Model):
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner_question')
+  semester = models.ForeignKey(MasterSemesters, on_delete=models.CASCADE, related_name='Semester_question', null=True)
+  branch = models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='Branch_question', null=True)
+  subject = models.ForeignKey(MasterSubjects, on_delete=models.CASCADE, related_name='Master_question', null=True)
+  file = models.FileField(blank=True, null=True)
+  file_snippet = models.FileField(blank=True, null=True)
+  Description = models.CharField(max_length=200, default=" ")
+  Uploaded_on = models.DateField(auto_now_add=True)
+
+  def __str__(self):
+      return self.Description

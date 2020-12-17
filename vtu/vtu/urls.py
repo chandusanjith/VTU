@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('apiv1/LoadMasterData/', views.FetchMasterList.as_view()),
     path('apiv1/Notes/<sem>/<branch>/<subject>', views.SnippetList.as_view()),
-    path('apiv1/Subjects/<sem>/<branch>',views.FetchSubject.as_view() )
+    path('apiv1/Subjects/<sem>/<branch>',views.FetchSubject.as_view() ),
+    path('apiv1/QP/<sem>/<branch>/<subject>', views.QuestionPaperList.as_view()),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)

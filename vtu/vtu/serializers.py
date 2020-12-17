@@ -1,11 +1,16 @@
 from rest_framework import serializers
-from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects
+from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers
 
 
 class NotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = MasterNotes
         fields = ('owner','file','Description','file_snippet','author')
+
+class QuestionPaperSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MasterQuestionPapers
+        fields = ('owner','file','Description','file_snippet')
 
 class SubjectSerializer(serializers.ModelSerializer):
   class Meta:
