@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 from django.core import serializers
-from .models import MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers
-from .serializers import NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer
+from .models import MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers, MasterVideoLab
+from .serializers import NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer
 from rest_framework import parsers
 from collections import namedtuple
 from django.contrib import admin
@@ -68,3 +68,22 @@ class FetchSubject(APIView):
       return Response({"ERROR":"404 NO DATA FOUND :("}, status=status.HTTP_404_NOT_FOUND)
     sub_serializer = SubjectSerializer(Sub_raw, many=True)
     return Response(sub_serializer.data, status=status.HTTP_200_OK)
+
+
+class LabManualVid(APIView):
+  def get(self, request, sem, branch, subject, program_id, format=None):
+    print(sem)
+    print(branch)
+    print(subject)
+    print(program_id)
+    ws_semester = MasterSemesters.objects.filter(sem_name = sem).first()
+    print(ws_semester)
+    ws_branch = MasterBranches.objects.filter(branch_name = branch).first()
+    print(ws_branch)
+    ws_subject = MasterSubjects.objects.filter(subject_name = subject).first()
+    print(ws_subject)
+    video_master = MasterVideoLab.objects.filter(semester=ws_semester,subject=ws_subject,branch=ws_branch,programid=program_id)
+    if not video_master:
+      return Response({"ERROR":"404 NO DATA FOUND :("}, status=status.HTTP_404_NOT_FOUND)  
+    video_serializer = MasterVideoLabSerializer(video_master, many=True)
+    return Response(video_serializer.data, status=status.HTTP_200_OK)

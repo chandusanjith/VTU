@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers
+from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab
 
 
 class NotesSerializer(serializers.ModelSerializer):
@@ -31,3 +31,7 @@ class NotesMasterSerializer(serializers.Serializer):
     semester = SemesterSerilizer(many=True)
     branches = BranchesSerilizer(many=True)       
 
+class MasterVideoLabSerializer(serializers.ModelSerializer):
+   class Meta:
+     model = MasterVideoLab
+     fields = '__all__' 

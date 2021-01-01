@@ -54,3 +54,23 @@ class MasterQuestionPapers(models.Model):
 
   def __str__(self):
       return self.Description
+
+class MasterProgramId(models.Model):
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='id_question')
+  semester = models.ForeignKey(MasterSemesters, on_delete=models.CASCADE, related_name='id_question', null=True)
+  branch = models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='id_question', null=True)
+  subject = models.ForeignKey(MasterSubjects, on_delete=models.CASCADE, related_name='id_question', null=True)  
+  programid = models.IntegerField(default=0)
+
+
+class MasterVideoLab(models.Model):
+  owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='videolab_owner')
+  semester = models.ForeignKey(MasterSemesters, on_delete=models.CASCADE, related_name='videolab_question', null=True)
+  subject = models.ForeignKey(MasterSubjects, on_delete=models.CASCADE, related_name='videolab_question', null=True)
+  branch = models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='videolab_question', null=True)
+  programid = models.IntegerField(default=0)
+  title = models.CharField(max_length=200, default=" ")
+  video = models.FileField(blank=True, null=True)
+  views = models.IntegerField(default=0)
+  description = models.CharField(max_length=400, default=" ")
+  thumbnail = models.FileField(blank=False, null=True)
