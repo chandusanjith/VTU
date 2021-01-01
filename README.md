@@ -17,3 +17,9 @@
 ### Response:
 
 ![alt text](https://github.com/chandusanjith/VTU/blob/master/vtu3.png?raw=true)
+
+
+
+### LabManual video featre API end API
+
+### https://vtu.pythonanywhere.com/apiv1/LabVid/3rd%20SEMESTER/Information%20Science%20&%20Engineering/Analog%20and%20Digital%20Electronics%20Laboratory/1
