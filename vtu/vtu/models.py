@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+FORCE_UPDATE_CHOICES = (
+  ('YES', 'YES'),
+  ('NO', 'NO'),
+)
 
 class MasterSemesters(models.Model):
   sem_name = models.CharField(max_length=200, unique=True)
@@ -74,3 +78,14 @@ class MasterVideoLab(models.Model):
   views = models.IntegerField(default=0)
   description = models.CharField(max_length=400, default=" ")
   thumbnail = models.FileField(blank=False, null=True)
+
+class DeviceAuth(models.Model):
+  device_key = models.CharField(max_length=16, default=" ")
+  mapped_key = models.CharField(max_length=16, default=" ")
+
+class AppVersion(models.Model):
+  version = models.CharField(max_length=16, default=" ")
+  updated_on = models.DateField(auto_now_add=True)
+
+class AppForceUpdateRequired(models.Model):
+  force_update_required =  models.CharField(choices=FORCE_UPDATE_CHOICES, max_length=3)
