@@ -1,42 +1,97 @@
 from rest_framework import serializers
-from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab, MasterSyllabusCopy
+from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab, MasterSyllabusCopy,MasterAbout,DeviceAuth
 
 
 class NotesSerializer(serializers.ModelSerializer):
+    Auth_key = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = MasterNotes
-        fields = ('owner','file','Description','file_snippet','author')
+        fields = ('owner','file','Description','file_snippet','author','Auth_key')
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
 
 class QuestionPaperSerializer(serializers.ModelSerializer):
+    Auth_key = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = MasterQuestionPapers
-        fields = ('owner','file','Description','file_snippet')
+        fields = ('owner','file','Description','file_snippet','Auth_key')
+
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
 
 class SubjectSerializer(serializers.ModelSerializer):
+  Auth_key = serializers.SerializerMethodField(read_only=True)
   class Meta:
       model = MasterSubjects
       fields = '__all__'
 
+  def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
+
 class BranchesSerilizer(serializers.ModelSerializer):
-   class Meta:
-     model = MasterBranches
-     fields = '__all__'
+    Auth_key = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+      model = MasterBranches
+      fields = '__all__'
+
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
 
 class SemesterSerilizer(serializers.ModelSerializer):
-   class Meta:
-     model = MasterSemesters
-     fields = '__all__'
+    Auth_key = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+      model = MasterSemesters
+      fields = '__all__'
+
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
 
 class NotesMasterSerializer(serializers.Serializer):
     semester = SemesterSerilizer(many=True)
     branches = BranchesSerilizer(many=True)       
 
 class MasterVideoLabSerializer(serializers.ModelSerializer):
-   class Meta:
-     model = MasterVideoLab
-     fields = '__all__' 
+    Auth_key = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+      model = MasterVideoLab
+      fields = '__all__' 
+
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
 
 class LoadSyllabusCopySerializer(serializers.ModelSerializer):
-  class Meta:
-    model = MasterSyllabusCopy
-    fields = '__all__'
+    Auth_key = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+      model = MasterSyllabusCopy
+      fields = '__all__'
+      
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
+
+class MasterAboutSerializer(serializers.ModelSerializer):
+
+    Auth_key = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+      model = MasterAbout
+     #fields = ('name','designation','about','Auth_key')
+      fields='__all__'
+
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key

@@ -91,5 +91,13 @@ class AppForceUpdateRequired(models.Model):
   force_update_required =  models.CharField(choices=FORCE_UPDATE_CHOICES, max_length=3)
 
 class MasterSyllabusCopy(models.Model):
+  branch=models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='syllabus_branch', null=True)
   file = models.FileField(blank=True, null=True)
   updated_on = models.DateField(auto_now_add=True)
+
+class MasterAbout(models.Model):
+  name=models.CharField(max_length=40, default=" ")
+  designation=models.CharField(max_length=40, default=" ")
+  about=models.CharField(max_length=80, default=" ")
+  updated_on = models.DateField(auto_now_add=True)
+  
