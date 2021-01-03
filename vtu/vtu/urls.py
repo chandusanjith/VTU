@@ -22,10 +22,12 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('apiv1/LoadMasterData/', views.FetchMasterList.as_view()),
-    path('apiv1/Notes/<sem>/<branch>/<subject>', views.SnippetList.as_view()),
-    path('apiv1/Subjects/<sem>/<branch>',views.FetchSubject.as_view() ),
-    path('apiv1/QP/<sem>/<branch>/<subject>', views.QuestionPaperList.as_view()),
-    path('apiv1/LabVid/<sem>/<branch>/<subject>/<program_id>', views.LabManualVid.as_view()),
+    path('apiv1/InitialLoad/<device_auth>', views.InitialLoad.as_view()),
+    path('apiv1/LoadMasterData/<device_auth>', views.FetchMasterList.as_view()),
+    path('apiv1/Notes/<sem>/<branch>/<subject>/<device_auth>', views.SnippetList.as_view()),
+    path('apiv1/Subjects/<sem>/<branch>/<device_auth>',views.FetchSubject.as_view() ),
+    path('apiv1/QP/<sem>/<branch>/<subject>/<device_auth>', views.QuestionPaperList.as_view()),
+    path('apiv1/LabVid/<sem>/<branch>/<subject>/<program_id>/<device_auth>', views.LabManualVid.as_view()),
+    path('apiv1/LoadSyllabusCopy/<device_auth>', views.LoadSyllabusCopy.as_view()),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)

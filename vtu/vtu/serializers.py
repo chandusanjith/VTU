@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab
+from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab, MasterSyllabusCopy
 
 
 class NotesSerializer(serializers.ModelSerializer):
@@ -35,3 +35,8 @@ class MasterVideoLabSerializer(serializers.ModelSerializer):
    class Meta:
      model = MasterVideoLab
      fields = '__all__' 
+
+class LoadSyllabusCopySerializer(serializers.ModelSerializer):
+  class Meta:
+    model = MasterSyllabusCopy
+    fields = '__all__'

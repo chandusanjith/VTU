@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers,MasterVideoLab,AppForceUpdateRequired,AppVersion,DeviceAuth
+from .models import MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers,MasterVideoLab,AppForceUpdateRequired,AppVersion,DeviceAuth,MasterSyllabusCopy
 
 
 admin.site.register(MasterNotes)
@@ -12,3 +12,4 @@ admin.site.register(MasterVideoLab)
 admin.site.register(AppForceUpdateRequired)
 admin.site.register(AppVersion)
 admin.site.register(DeviceAuth)
+admin.site.register(MasterSyllabusCopy)

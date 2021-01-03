@@ -89,3 +89,7 @@ class AppVersion(models.Model):
 
 class AppForceUpdateRequired(models.Model):
   force_update_required =  models.CharField(choices=FORCE_UPDATE_CHOICES, max_length=3)
+
+class MasterSyllabusCopy(models.Model):
+  file = models.FileField(blank=True, null=True)
+  updated_on = models.DateField(auto_now_add=True)
