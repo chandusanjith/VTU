@@ -43,18 +43,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 ""
-    
-###    'apiv1/InitialLoad/<device_auth>'
+       'apiv1/InitialLoad/<device_auth>'
 ### Load the app initially where backend creates new device or authenticates old device
-###    'apiv1/LoadMasterData/<device_auth>
+  'apiv1/LoadMasterData/<device_auth>
 ### FROM HERE ALL API CALLS SHOULD BE MADE WITH DEVICE ID AS PARAMETER IF NOT KY BACKEND WILL NOT PROCESS ANY REQUEST. 
-###    'apiv1/Notes/<sem>/<branch>/<subject>/<device_auth>'
+ 'apiv1/Notes/<sem>/<branch>/<subject>/<device_auth>'
 ### ABOVE API IS FOR NOTES
-###    'apiv1/Subjects/<sem>/<branch>/<device_auth>'
+ 'apiv1/Subjects/<sem>/<branch>/<device_auth>'
 ### ABOVE API IS FOR SUBJECTS
-###    'apiv1/QP/<sem>/<branch>/<subject>/<device_auth>'
+  'apiv1/QP/<sem>/<branch>/<subject>/<device_auth>'
 ### ABOVE API IS FOR QUESTION PAPER 
-###    'apiv1/LabVid/<sem>/<branch>/<subject>/<program_id>/<device_auth>'
+  'apiv1/LabVid/<sem>/<branch>/<subject>/<program_id>/<device_auth>'
 ### ABOVE API IS FOR LAB VIDEO
-###    'apiv1/LoadSyllabusCopy/<device_auth>'
+ 'apiv1/LoadSyllabusCopy/<device_auth>'
 ### ABOVE API FOR SYLLABUS COPY
