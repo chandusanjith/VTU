@@ -53,7 +53,7 @@ Including another URLconf
 ### ABOVE API IS FOR SUBJECTS
   'apiv1/QP/<sem>/<branch>/<subject>/<device_auth>'
 ### ABOVE API IS FOR QUESTION PAPER 
-  'apiv1/LabVid/<sem>/<branch>/<subject>/<program_id>/<device_auth>'
+  apiv1/LabVid/<sem>/<branch>/<subject>/<program_id>/<device_auth>
 ### ABOVE API IS FOR LAB VIDEO
  'apiv1/LoadSyllabusCopy/<device_auth>'
 ### ABOVE API FOR SYLLABUS COPY
