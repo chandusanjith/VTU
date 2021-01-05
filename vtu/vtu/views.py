@@ -14,6 +14,10 @@ from rest_framework import parsers
 from collections import namedtuple
 from django.contrib import admin
 from django.shortcuts import render
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from django.db.models.functions import ExtractMonth
+
 
 import random
 import string
@@ -162,7 +166,21 @@ class LoadAbout(APIView):
       return Response({"ERROR":"Access Denied"}, status=status.HTTP_404_NOT_FOUND)    
 
 def LoadDashBoard(request):
-    return render(request, 'index.html')
+    dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
+    authors_data = MasterAbout.objects.all()
+    notes_count = MasterNotes.objects.all().count()
+    qpaper_count = MasterQuestionPapers.objects.all().count()
+    syllcopy_count = MasterSyllabusCopy.objects.all().count()
+    LabManual_vidoes_added = MasterVideoLab.objects.all().count()
+    context={
+        'device_data':dat,
+        'authors_data':authors_data,
+        'notes_count':notes_count,
+        'syllcopy_count':syllcopy_count,
+        'LabManual_vidoes_added':LabManual_vidoes_added,
+        'qpaper_count':qpaper_count,
+    }
+    return render(request, 'index.html', context)
 
 def AuthRequired(auth_key):
   if len(auth_key) != 16:

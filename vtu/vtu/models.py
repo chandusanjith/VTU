@@ -82,6 +82,7 @@ class MasterVideoLab(models.Model):
 class DeviceAuth(models.Model):
   device_key = models.CharField(max_length=16, default=" ")
   mapped_key = models.CharField(max_length=16, default=" ")
+  updated_on = models.DateField(auto_now_add=True)
 
 class AppVersion(models.Model):
   version = models.CharField(max_length=16, default=" ")
