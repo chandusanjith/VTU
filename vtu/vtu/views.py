@@ -161,6 +161,7 @@ class LoadAbout(APIView):
       return Response({"ERROR":"Access Denied"}, status=status.HTTP_404_NOT_FOUND)    
 
 def AuthRequired(auth_key):
+    #testing git commit
   if len(auth_key) != 16:
     return False
   if DeviceAuth.objects.filter(device_key=auth_key).exists():
