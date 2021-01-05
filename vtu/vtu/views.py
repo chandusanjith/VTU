@@ -17,6 +17,7 @@ from django.shortcuts import render
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.db.models.functions import ExtractMonth
+from django.db.models import F,Q
 
 
 import random

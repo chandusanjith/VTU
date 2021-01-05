@@ -41,6 +41,7 @@ class MasterNotes(models.Model):
   file_snippet = models.FileField(blank=True, null=True)
   Description = models.CharField(max_length=200, default=" ")
   Uploaded_on = models.DateField(auto_now_add=True)
+  downloads = models.IntegerField(default=0)
 
   def __str__(self):
       return self.Description 
@@ -55,6 +56,7 @@ class MasterQuestionPapers(models.Model):
   file_snippet = models.FileField(blank=True, null=True)
   Description = models.CharField(max_length=200, default=" ")
   Uploaded_on = models.DateField(auto_now_add=True)
+  downloads = models.IntegerField(default=0)
 
   def __str__(self):
       return self.Description
@@ -79,22 +81,40 @@ class MasterVideoLab(models.Model):
   description = models.CharField(max_length=400, default=" ")
   thumbnail = models.FileField(blank=False, null=True)
 
+  def __str__(self):
+      return self.title
+
 class DeviceAuth(models.Model):
   device_key = models.CharField(max_length=16, default=" ")
   mapped_key = models.CharField(max_length=16, default=" ")
   updated_on = models.DateField(auto_now_add=True)
 
+  def __str__(self):
+      return self.device_key
+
 class AppVersion(models.Model):
   version = models.CharField(max_length=16, default=" ")
   updated_on = models.DateField(auto_now_add=True)
 
+  def __str__(self):
+      return self.version
+
+
 class AppForceUpdateRequired(models.Model):
   force_update_required =  models.CharField(choices=FORCE_UPDATE_CHOICES, max_length=3)
 
+  def __str__(self):
+    return self.force_update_required
+
 class MasterSyllabusCopy(models.Model):
   branch=models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='syllabus_branch', null=True)
+  
   file = models.FileField(blank=True, null=True)
   updated_on = models.DateField(auto_now_add=True)
+  downloads = models.IntegerField(default=0)
+
+  def __str__(self):
+    return self.force_update_required
 
 class MasterAbout(models.Model):
   name=models.CharField(max_length=40, default=" ")
