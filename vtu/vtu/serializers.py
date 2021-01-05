@@ -6,7 +6,7 @@ class NotesSerializer(serializers.ModelSerializer):
     Auth_key = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = MasterNotes
-        fields = ('owner','file','Description','file_snippet','author','Auth_key')
+        fields = ('id','owner','file','Description','file_snippet','author','downloads','Auth_key')
     def get_Auth_key(self,request):
       Device_key = self.context.get("Device_key")
       mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
@@ -16,7 +16,7 @@ class QuestionPaperSerializer(serializers.ModelSerializer):
     Auth_key = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = MasterQuestionPapers
-        fields = ('owner','file','Description','file_snippet','Auth_key')
+        fields = ('id','owner','file','Description','file_snippet','downloads','Auth_key')
 
     def get_Auth_key(self,request):
       Device_key = self.context.get("Device_key")

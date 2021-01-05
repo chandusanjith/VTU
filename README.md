@@ -28,32 +28,31 @@ here 1234567891234567 ---> is unique devuce id (it supports varchars)
 ### from now without device id my backend will not process any request.
 
 
-"""vtu URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-""
-       'apiv1/InitialLoad/<device_auth>'
+##  https://vtu.pythonanywhere.com/apiv1/InitialLoad/device_auth
 ### Load the app initially where backend creates new device or authenticates old device
-  'apiv1/LoadMasterData/<device_auth>
-### FROM HERE ALL API CALLS SHOULD BE MADE WITH DEVICE ID AS PARAMETER IF NOT KY BACKEND WILL NOT PROCESS ANY REQUEST. 
- 'apiv1/Notes/<sem>/<branch>/<subject>/<device_auth>'
+
+##  https://vtu.pythonanywhere.com/apiv1/LoadMasterData/device_auth
+### FROM HERE ALL API CALLS SHOULD BE MADE WITH DEVICE ID AS PARAMETER IF NOT KY BACKEND WILL NOT PROCESS ANY REQUEST.
+
+## https://vtu.pythonanywhere.com/apiv1/Notes/sem/branch/subject/device_auth
 ### ABOVE API IS FOR NOTES
- 'apiv1/Subjects/<sem>/<branch>/<device_auth>'
+
+## https://vtu.pythonanywhere.com/apiv1/Subjects/sem/branch/device_auth
 ### ABOVE API IS FOR SUBJECTS
-  'apiv1/QP/<sem>/<branch>/<subject>/<device_auth>'
+
+##  https://vtu.pythonanywhere.com/apiv1/QP/sem/branch/subject/device_auth
 ### ABOVE API IS FOR QUESTION PAPER 
-  apiv1/LabVid/'<sem>'/<branch>/<subject>/<program_id>/<device_auth>
+
+##  https://vtu.pythonanywhere.com/apiv1/LabVid/'sem'/branch/subject/program_id/device_auth
 ### ABOVE API IS FOR LAB VIDEO
- 'apiv1/LoadSyllabusCopy/<device_auth>'
+
+## https://vtu.pythonanywhere.com/apiv1/LoadSyllabusCopy/device_auth
 ### ABOVE API FOR SYLLABUS COPY
+
+##  https://vtu.pythonanywhere.com/apiv1/TrackDownloads/type/id/device_auth
+### ABOVE API CALL IS FOR TRACKING DOWNLOADS AND VIDEO VIEWS.
+#### type -->  Notes -> notes
+####            Qpaper -> question paper
+####            SBcopy -> syllabus copy
+####            LabVid -> Lab Video
+#### id --> send id which i return through json response

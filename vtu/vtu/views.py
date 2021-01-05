@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 from django.core import serializers
-from .models import MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
+from .models import MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
 from .serializers import NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
 from rest_framework import parsers
 from collections import namedtuple
@@ -56,6 +56,7 @@ class SnippetList(APIView):
 
   def get(self, request, sem, branch, subject, device_auth,format=None):
     if AuthRequired(device_auth) == True:
+      MasterServiceHits.objects.filter(id=1).update(notes_hit=F('notes_hit') + 1)
       ws_semester = MasterSemesters.objects.filter(sem_name = sem).first()
       ws_branch = MasterBranches.objects.filter(branch_name = branch).first()
       ws_subject = MasterSubjects.objects.filter(subject_name = subject).first()
@@ -76,6 +77,7 @@ class QuestionPaperList(APIView):
 
   def get(self, request, sem, branch, subject, device_auth, format=None):
     if AuthRequired(device_auth) == True:
+      MasterServiceHits.objects.filter(id=1).update(question_paper_hit=F('question_paper_hit') + 1)
       ws_semester = MasterSemesters.objects.filter(sem_name = sem).first()
       ws_branch = MasterBranches.objects.filter(branch_name = branch).first()
       ws_subject = MasterSubjects.objects.filter(subject_name = subject).first()
@@ -126,6 +128,7 @@ class FetchSubject(APIView):
 class LabManualVid(APIView):
   def get(self, request, sem, branch, subject, program_id, device_auth, format=None):
     if AuthRequired(device_auth) == True:
+      MasterServiceHits.objects.filter(id=1).update(lab_manual_video_hit=F('lab_manual_video_hit') + 1)
       ws_semester = MasterSemesters.objects.filter(sem_name = sem).first()
       ws_branch = MasterBranches.objects.filter(branch_name = branch).first()
       ws_subject = MasterSubjects.objects.filter(subject_name = subject).first()
@@ -142,6 +145,7 @@ class LabManualVid(APIView):
 class LoadSyllabusCopy(APIView):
   def get(self, request, branch, device_auth, format=None):
     if AuthRequired(device_auth) == True:
+      MasterServiceHits.objects.filter(id=1).update(syllabus_copy_hit=F('syllabus_copy_hit') + 1)
       ws_branch = MasterBranches.objects.filter(branch_name = branch).first()
       syllabus_master = MasterSyllabusCopy.objects.filter(branch=ws_branch)
       if not syllabus_master:
@@ -165,6 +169,27 @@ class LoadAbout(APIView):
       return Response(about_serializer, status=status.HTTP_200_OK)
     else:
       return Response({"ERROR":"Access Denied"}, status=status.HTTP_404_NOT_FOUND)    
+
+class TrackDownloads(APIView):
+    def get(self, request, type, id, device_auth, format=None):
+        if AuthRequired(device_auth) == True:
+            mapped_key = DeviceAuth.objects.filter(device_key=device_auth)
+            if type == 'Notes':
+                MasterNotes.objects.filter(id=id).update(downloads=F('downloads') + 1)
+                return Response({"status":"O.K"}, status=status.HTTP_200_OK)
+            elif type == 'Qpaper':
+                MasterQuestionPapers.objects.filter(id=id).update(downloads=F('downloads') + 1)
+                return Response({"status": "O.K"}, status=status.HTTP_200_OK)
+            elif type == 'SBcopy':
+                MasterSyllabusCopy.objects.filter(id=id).update(downloads=F('downloads') + 1)
+                return Response({"status": "O.K"}, status=status.HTTP_200_OK)
+            elif type == 'LabVid':
+                MasterVideoLab.objects.filter(id=id).update(views=F('views') + 1)
+                return Response({"status": "O.K"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"ERROR":"OOPS! an internal error occured :("}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
 
 def LoadDashBoard(request):
     dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')

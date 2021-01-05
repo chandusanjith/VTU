@@ -108,17 +108,25 @@ class AppForceUpdateRequired(models.Model):
 
 class MasterSyllabusCopy(models.Model):
   branch=models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='syllabus_branch', null=True)
-  
+  title = models.CharField(max_length=40, default=" ")
   file = models.FileField(blank=True, null=True)
   updated_on = models.DateField(auto_now_add=True)
   downloads = models.IntegerField(default=0)
 
   def __str__(self):
-    return self.force_update_required
+    return self.title
 
 class MasterAbout(models.Model):
   name=models.CharField(max_length=40, default=" ")
   designation=models.CharField(max_length=40, default=" ")
   about=models.CharField(max_length=80, default=" ")
   updated_on = models.DateField(auto_now_add=True)
-  
+
+  def __str__(self):
+    return self.designation
+
+class MasterServiceHits(models.Model):
+  notes_hit = models.IntegerField(default=0)
+  syllabus_copy_hit = models.IntegerField(default=0)
+  question_paper_hit = models.IntegerField(default=0)
+  lab_manual_video_hit = models.IntegerField(default=0)
