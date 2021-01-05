@@ -13,6 +13,7 @@ from .serializers import NotesSerializer, NotesMasterSerializer, SubjectSerializ
 from rest_framework import parsers
 from collections import namedtuple
 from django.contrib import admin
+from django.shortcuts import render
 
 import random
 import string
@@ -160,8 +161,10 @@ class LoadAbout(APIView):
     else:
       return Response({"ERROR":"Access Denied"}, status=status.HTTP_404_NOT_FOUND)    
 
+def LoadDashBoard(request):
+    return render(request, 'index.html')
+
 def AuthRequired(auth_key):
-    #testing git commit
   if len(auth_key) != 16:
     return False
   if DeviceAuth.objects.filter(device_key=auth_key).exists():
