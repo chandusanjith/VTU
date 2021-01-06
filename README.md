@@ -56,3 +56,14 @@ here 1234567891234567 ---> is unique devuce id (it supports varchars)
 ####            SBcopy -> syllabus copy
 ####            LabVid -> Lab Video
 #### id --> send id which i return through json response
+
+## https://vtu.pythonanywhere.com/apiv1/FeedBack
+### ABOVE API IS TO SEND FEEDBACK AND INPUT SHOULD BE IN THE FORMAT GIVEN BELOW
+
+##### {
+##### "device_id":"1234567891234567",
+##### "name":"chandu sanjith",
+##### "email":"chandusanjith@gmail.com",
+##### "contact_number":"6360723237",
+##### "feed_back":"Very nice app"
+##### }

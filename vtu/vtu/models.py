@@ -130,3 +130,31 @@ class MasterServiceHits(models.Model):
   syllabus_copy_hit = models.IntegerField(default=0)
   question_paper_hit = models.IntegerField(default=0)
   lab_manual_video_hit = models.IntegerField(default=0)
+
+  def __str__(self):
+    return self.notes_hit + self.syllabus_copy_hit + self.question_paper_hit + self.lab_manual_video_hit
+
+class FeedBackForm(models.Model):
+  device_id = models.CharField(max_length=16, default="", null=False)
+  name = models.CharField(max_length=50, default="",null=False)
+  email = models.CharField(max_length=50, default="")
+  contact_number = models.CharField(max_length=15, default="")
+  feed_back = models.CharField(max_length=200, default="", null=False)
+  added_on = models.DateField(auto_now_add=True)
+
+  def __str__(self):
+    return self.name
+
+class EmailConfig(models.Model):
+  email_id = models.CharField(max_length=50, default="", null=False)
+  password = models.CharField(max_length=30, default="", null=False)
+
+  def __str__(self):
+    return self.email_id
+
+class AdminEmailId(models.Model):
+  mail_reciever_email = models.CharField(max_length=50, default="", null=False)
+  added_on = models.DateField(auto_now_add=True)
+
+  def __str__(self):
+    return self.mail_reciever_email

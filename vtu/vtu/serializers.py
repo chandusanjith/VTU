@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab, MasterSyllabusCopy,MasterAbout,DeviceAuth
+from .models import FeedBackForm,MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab, MasterSyllabusCopy,MasterAbout,DeviceAuth
 
 
 class NotesSerializer(serializers.ModelSerializer):
@@ -95,3 +95,8 @@ class MasterAboutSerializer(serializers.ModelSerializer):
       Device_key = self.context.get("Device_key")
       mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
       return mapped_key[0].mapped_key
+
+class FeedBackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedBackForm
+        fields = '__all__'
