@@ -139,7 +139,7 @@ class FeedBackForm(models.Model):
   name = models.CharField(max_length=50, default="",null=False)
   email = models.CharField(max_length=50, default="")
   contact_number = models.CharField(max_length=15, default="")
-  feed_back = models.CharField(max_length=200, default="", null=False)
+  feed_back = models.CharField(max_length=1000, default="", null=False)
   added_on = models.DateField(auto_now_add=True)
 
   def __str__(self):
