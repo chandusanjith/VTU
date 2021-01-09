@@ -13,7 +13,7 @@ class NotesSerializer(serializers.ModelSerializer):
       mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
       return mapped_key[0].mapped_key
 
-    def get_type(self):
+    def get_type(self, request):
         return "Notes"
 
 class QuestionPaperSerializer(serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class QuestionPaperSerializer(serializers.ModelSerializer):
       mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
       return mapped_key[0].mapped_key
 
-    def get_type(self):
+    def get_type(self, request):
         return "Qpaper"
 
 class SubjectSerializer(serializers.ModelSerializer):
@@ -80,7 +80,7 @@ class MasterVideoLabSerializer(serializers.ModelSerializer):
       mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
       return mapped_key[0].mapped_key
 
-    def get_type(self):
+    def get_type(self, request):
         return "LabVid"
 
 class LoadSyllabusCopySerializer(serializers.ModelSerializer):
@@ -95,7 +95,7 @@ class LoadSyllabusCopySerializer(serializers.ModelSerializer):
       mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
       return mapped_key[0].mapped_key
 
-    def get_type(self):
+    def get_type(self,request):
         return "SBcopy"
 
 class MasterAboutSerializer(serializers.ModelSerializer):
