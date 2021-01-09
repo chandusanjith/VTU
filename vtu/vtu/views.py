@@ -232,27 +232,6 @@ class LoadFeedBack(APIView):
 
 class ContactUS(APIView):
 
-    def GenerateOTP(self, dev_id, email, name):
-        from random import randint
-        range_start = 10 ** (5 - 1)
-        range_end = (10 ** 5) - 1
-        otp = randint(range_start, range_end)
-        if OTPValidate.objects.filter(device_id=dev_id).exists():
-            OTPValidate.objects.filter(device_id=dev_id).update(otp=otp, email=email)
-        else:
-            ws_otp = OTPValidate(device_id=dev_id, otp=otp, email=email)
-            ws_otp.save()
-        context = {
-            'name': name,
-            'otp': otp
-        }
-        subject = 'Hello ' + name + ' please find the OTP'
-        mail_value = SendEmail(email, context, subject, 'OTPMail.html')
-        if mail_value == True:
-            return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"ERROR": "OOPS! an internal error occured :("}, status=status.HTTP_404_NOT_FOUND)
-
     def post(self, request, format=None):
         if AuthRequired(request.data['device_id']) == True:
             if ContactUs.objects.filter(device_id = request.data['device_id']).exists():
@@ -264,14 +243,24 @@ class ContactUS(APIView):
                                                                                      contact=request.data['contact'],
                                                                                      user_message=request.data['user_message'])
                 if ContactUs.objects.filter(device_id = request.data['device_id'], user_verified = False):
-                    return self.GenerateOTP(request.data['device_id'],request.data['email'], request.data['name'])
+                    response = GenerateOTP(request.data['device_id'],request.data['email'], request.data['name'])
+                    if response == True:
+                        return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
+                    else:
+                        return Response({"ERROR": "OOPS! an internal error occured :("},
+                                            status=status.HTTP_404_NOT_FOUND)
                 else:
                     return Response({"status": "User has been verified, no need of otp validation"}, status=status.HTTP_200_OK)
         else:
             serializer = ContactUsSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
-            return self.GenerateOTP(request.data['device_id'], request.data['email'], request.data['name'])
+            response = GenerateOTP(request.data['device_id'], request.data['email'], request.data['name'])
+            if response == True:
+                return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"ERROR": "OOPS! an internal error occured :("},
+                                status=status.HTTP_404_NOT_FOUND)
 
 
 class ValidateOTP(APIView):
@@ -327,3 +316,20 @@ def AuthRequired(auth_key):
   else:
     return False 
 
+def GenerateOTP(dev_id, email, name):
+    from random import randint
+    range_start = 10 ** (5 - 1)
+    range_end = (10 ** 5) - 1
+    otp = randint(range_start, range_end)
+    if OTPValidate.objects.filter(device_id=dev_id).exists():
+        OTPValidate.objects.filter(device_id=dev_id).update(otp=otp, email=email)
+    else:
+        ws_otp = OTPValidate(device_id=dev_id, otp=otp, email=email)
+        ws_otp.save()
+    context = {
+        'name': name,
+        'otp': otp
+    }
+    subject = 'Hello ' + name + ' please find the OTP'
+    mail_value = SendEmail(email, context, subject, 'OTPMail.html')
+    return mail_value
