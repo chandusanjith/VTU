@@ -67,3 +67,21 @@ here 1234567891234567 ---> is unique devuce id (it supports varchars)
 ##### "contact_number":"6360723237",
 ##### "feed_back":"Very nice app"
 ##### }
+
+
+#### https://vtu.pythonanywhere.com/apiv1/GetTerms/device_auth
+### above api returns terms and conditions
+
+#### https://vtu.pythonanywhere.com/apiv1/ContactUS
+### above api used to open contact us where you need to send json data in below format.
+
+#### {
+#### "name":"cs",
+#### "email":"chandusanjith.t.2610@gmail.com",
+#### "contact":"6360723237",
+#### "device_id":"1234567891234567",
+#### "user_message":"testing"
+#### }
+
+#### https://vtu.pythonanywhere.com/apiv1/ValidateOTP/otp>/device_auth
+### using this send me the otp and dev id.

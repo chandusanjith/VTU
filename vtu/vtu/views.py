@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 from django.core import serializers
-from .models import AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
-from .serializers import FeedBackSerializer,NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
+from .models import OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
+from .serializers import ContactUsSerializer,TermsAndConditionsSerialier,FeedBackSerializer,NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
 from rest_framework import parsers
 from collections import namedtuple
 from django.contrib import admin
@@ -18,10 +18,7 @@ from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.db.models.functions import ExtractMonth
 from django.db.models import F
-from django.template.loader import render_to_string, get_template
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import smtplib
+from .automaticmail import SendEmail
 
 
 import random
@@ -203,8 +200,14 @@ class FeedBack(APIView):
             if serializer.is_valid():
                 serializer.save()
                 admin_emails = AdminEmailId.objects.all()
+                context = {
+                    'name': request.data['name'],
+                    'feedback': request.data['feed_back'],
+                    'device_id': request.data['device_id'],
+                }
+                subject = 'FeedBack has been given by ' + ' ' + request.data['name']
                 for reciever_mail in admin_emails:
-                    mail_value = SendEmail(reciever_mail.mail_reciever_email , request.data['name'],request.data['feed_back'],request.data['device_id'], 'FeedBackMail.html')
+                    mail_value = SendEmail(reciever_mail.mail_reciever_email , context,subject, 'FeedBackMail.html')
                 if mail_value == True:
                     return Response({"status": "O.K"}, status=status.HTTP_200_OK)
                 else:
@@ -214,8 +217,90 @@ class FeedBack(APIView):
         else:
             return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
 
-def ContactUS(APIView):
-    def get(self, request, type, id, device_auth, format=None):
+class LoadFeedBack(APIView):
+    def get(self, request, device_auth, format=None):
+        if AuthRequired(device_auth) == True:
+            ws_terms = TermsAndConditions.objects.filter(id=1)
+            if not ws_terms:
+                return Response({
+                    "ERROR": "404 NO DATA FOUND :("}, status=status.HTTP_404_NOT_FOUND)
+            terms_serializer = TermsAndConditionsSerialier(ws_terms, many=True, context={'Device_key': device_auth}
+                                                 ).data
+            return Response(terms_serializer, status=status.HTTP_200_OK)
+        else:
+            return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
+
+class ContactUS(APIView):
+
+    def GenerateOTP(self, dev_id, email, name):
+        from random import randint
+        range_start = 10 ** (5 - 1)
+        range_end = (10 ** 5) - 1
+        otp = randint(range_start, range_end)
+        if OTPValidate.objects.filter(device_id=dev_id).exists():
+            OTPValidate.objects.filter(device_id=dev_id).update(otp=otp, email=email)
+        else:
+            ws_otp = OTPValidate(device_id=dev_id, otp=otp, email=email)
+            ws_otp.save()
+        context = {
+            'name': name,
+            'otp': otp
+        }
+        subject = 'Hello ' + name + ' please find the OTP'
+        mail_value = SendEmail(email, context, subject, 'OTPMail.html')
+        if mail_value == True:
+            return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"ERROR": "OOPS! an internal error occured :("}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, format=None):
+        if AuthRequired(request.data['device_id']) == True:
+            if ContactUs.objects.filter(device_id = request.data['device_id']).exists():
+                old_contact_data = ContactUs.objects.filter(device_id = request.data['device_id'])
+                if old_contact_data[0].email != request.data['email']:
+                    ContactUs.objects.filter(device_id=request.data['device_id']).update(user_verified = False)
+                ContactUs.objects.filter(device_id=request.data['device_id']).update(name=request.data['name'],
+                                                                                     email=request.data['email'],
+                                                                                     contact=request.data['contact'],
+                                                                                     user_message=request.data['user_message'])
+                if ContactUs.objects.filter(device_id = request.data['device_id'], user_verified = False):
+                    return self.GenerateOTP(request.data['device_id'],request.data['email'], request.data['name'])
+                else:
+                    return Response({"status": "User has been verified, no need of otp validation"}, status=status.HTTP_200_OK)
+        else:
+            serializer = ContactUsSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+            return self.GenerateOTP(request.data['device_id'], request.data['email'], request.data['name'])
+
+
+class ValidateOTP(APIView):
+    def get(self, request, otp, device_auth, format=None):
+        if AuthRequired(device_auth) == True:
+            otp_inside = OTPValidate.objects.filter(device_id=device_auth)
+            if otp == str(otp_inside[0].otp):
+                ContactUs.objects.filter(device_id = device_auth, email = otp_inside[0].email).update(user_verified = True)
+                contact_details = ContactUs.objects.filter(device_id = device_auth, email = otp_inside[0].email)
+                context = {
+                    'name':contact_details[0].name,
+                    'contact': contact_details[0].contact,
+                    'email':otp_inside[0].email
+                }
+                subject = 'Thanks for contacting us!'
+                mail_status = SendEmail(otp_inside[0].email, context, subject, 'ThanksForContactingUs.html')
+                if mail_status == False:
+                    return Response({"ERROR": "OOPS! an internal error occured :("}, status=status.HTTP_404_NOT_FOUND)
+                subject = "Some user has contacted us!!!"
+                admin_emails = AdminEmailId.objects.all()
+                for reciever_mail in admin_emails:
+                    mail_status = SendEmail(reciever_mail.mail_reciever_email, context, subject, 'ThanksForContactingUs.html')
+                    if mail_status == False:
+                        return Response({"ERROR": "OOPS! an internal error occured :("},
+                                        status=status.HTTP_404_NOT_FOUND)
+            else:
+                #ContactUs.objects.filter(device_id=device_auth, email=otp_inside[0].email).delete()
+                return Response({"status":"OTP not matching"}, status=status.HTTP_403_FORBIDDEN)
+
 
 def LoadDashBoard(request):
     dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
@@ -242,30 +327,3 @@ def AuthRequired(auth_key):
   else:
     return False 
 
-def SendEmail(reciever_mail, Name,Feedback,Device_auth,format_html):
-    context = {
-        'name': Name,
-        'feedback': Feedback,
-        'device_id': Device_auth,
-    }
-    mail_html = get_template(format_html).render(context)
-    # The mail addresses and password
-    sender = EmailConfig.objects.filter(id=1).first()
-    sender_address = sender.email_id
-    sender_pass = sender.password
-    receiver_address = reciever_mail
-    # Setup the MIME
-    message = MIMEMultipart()
-    message['From'] = sender_address
-    message['To'] = receiver_address
-    message['Subject'] = 'FeedBack has been given by ' + ' ' + Name  # The subject line
-    # The body and the attachments for the mail
-    message.attach(MIMEText(mail_html, 'html'))
-    # Create SMTP session for sending the mail
-    session = smtplib.SMTP('smtp.gmail.com', 587)  # use gmail with port
-    session.starttls()  # enable security
-    session.login(sender_address, sender_pass)  # login with mail_id and password
-    text = message.as_string()
-    session.sendmail(sender_address, receiver_address, text)
-    session.quit()
-    return True

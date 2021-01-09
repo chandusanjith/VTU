@@ -161,13 +161,13 @@ class AdminEmailId(models.Model):
 
 class TermsAndConditions(models.Model):
   title = models.CharField(max_length=40, default=" ")
-  terms = models.CharField(max_length=1000, default=" ")
+  terms = models.TextField(max_length=1000, default=" ")
   added_on = models.DateField(auto_now_add=True)
 
   def __str__(self):
     return self.title
 
-class ContatUs(models.Model):
+class ContactUs(models.Model):
   name = models.CharField(max_length=40, default=" ")
   email = models.CharField(max_length=40, default=" ")
   contact = models.CharField(max_length=15, default=" ")
@@ -182,8 +182,9 @@ class ContatUs(models.Model):
 class OTPValidate(models.Model):
   device_id = models.CharField(max_length=16, default=" ")
   otp = models.IntegerField(default=0)
+  email = models.CharField(max_length=40, default=" ")
   updated_on = models.DateField(auto_now_add=True)
 
   def __str__(self):
-    return self.device_id + self.otp
+    return self.device_id + str(self.otp)
 
