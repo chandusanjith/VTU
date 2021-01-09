@@ -32,6 +32,7 @@ urlpatterns = [
     path('apiv1/About/<device_auth>', views.LoadAbout.as_view()),
     path('apiv1/TrackDownloads/<type>/<id>/<device_auth>', views.TrackDownloads.as_view()),
     path('apiv1/FeedBack', views.FeedBack.as_view()),
+    path('apiv1/ContactUS/<device_auth>', views.ContactUS.as_view()),
     path('Dashboard', views.LoadDashBoard),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)

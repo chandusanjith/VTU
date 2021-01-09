@@ -21,7 +21,7 @@ class QuestionPaperSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = MasterQuestionPapers
-        fields = ('id','owner','file','Description','file_snippet','downloads','Auth_key')
+        fields = ('id','owner','file','type','Description','file_snippet','downloads','Auth_key')
 
     def get_Auth_key(self,request):
       Device_key = self.context.get("Device_key")

@@ -214,6 +214,9 @@ class FeedBack(APIView):
         else:
             return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
 
+def ContactUS(APIView):
+    def get(self, request, type, id, device_auth, format=None):
+
 def LoadDashBoard(request):
     dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
     authors_data = MasterAbout.objects.all()
