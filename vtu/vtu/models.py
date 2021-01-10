@@ -117,13 +117,17 @@ class MasterSyllabusCopy(models.Model):
     return self.title
 
 class MasterAbout(models.Model):
-  name=models.CharField(max_length=40, default=" ")
-  designation=models.CharField(max_length=40, default=" ")
-  about=models.CharField(max_length=80, default=" ")
+  app_name=models.CharField(max_length=40, default=" ")
+  header=models.CharField(max_length=40, default=" ")
+  version = models.CharField(max_length=40, default=" ")
+  description=models.CharField(max_length=100, default=" ")
+  about_us_url=models.CharField(max_length=500, default=" ")
+  terms_url=models.CharField(max_length=500, default=" ")
+  privacy_url=models.CharField(max_length=500, default=" ")
   updated_on = models.DateField(auto_now_add=True)
 
   def __str__(self):
-    return self.designation
+    return self.app_name
 
 class MasterServiceHits(models.Model):
   notes_hit = models.IntegerField(default=0)

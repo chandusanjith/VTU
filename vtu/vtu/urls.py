@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from vtu import views
+from vtu import views, template_views
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -35,6 +35,9 @@ urlpatterns = [
     path('apiv1/GetTerms/<device_auth>', views.LoadFeedBack.as_view()),
     path('apiv1/ContactUS', views.ContactUS.as_view()),
     path('apiv1/ValidateOTP/<otp>/<device_auth>', views.ValidateOTP.as_view()),
-    path('Dashboard', views.LoadDashBoard),
+    path('Dashboard', template_views.LoadDashBoard),
+    path('PrivacyPolicy', template_views.LoadPrivacyPolicy),
+    path('Terms', template_views.LoadTerms),
+    path('AboutUS', template_views.LoadAboutus),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)

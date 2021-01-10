@@ -322,20 +322,3 @@ class ValidateOTP(APIView):
         else:
             return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
 
-def LoadDashBoard(request):
-    dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
-    authors_data = MasterAbout.objects.all()
-    notes_count = MasterNotes.objects.all().count()
-    qpaper_count = MasterQuestionPapers.objects.all().count()
-    syllcopy_count = MasterSyllabusCopy.objects.all().count()
-    LabManual_vidoes_added = MasterVideoLab.objects.all().count()
-    context={
-        'device_data':dat,
-        'authors_data':authors_data,
-        'notes_count':notes_count,
-        'syllcopy_count':syllcopy_count,
-        'LabManual_vidoes_added':LabManual_vidoes_added,
-        'qpaper_count':qpaper_count,
-    }
-    return render(request, 'index.html', context)
-
