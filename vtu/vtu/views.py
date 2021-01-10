@@ -298,7 +298,8 @@ class ValidateOTP(APIView):
                 context = {
                     'name':contact_details[0].name,
                     'contact': contact_details[0].contact,
-                    'email':otp_inside[0].email
+                    'email':otp_inside[0].email,
+                    'message':contact_details[0].user_message,
                 }
                 subject = 'Thanks for contacting us!'
                 mail_status = SendEmail(otp_inside[0].email, context, subject, 'ThanksForContactingUs.html')
