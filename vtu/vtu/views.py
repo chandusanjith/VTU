@@ -290,6 +290,8 @@ class ValidateOTP(APIView):
                 mail_status = SendEmail(otp_inside[0].email, context, subject, 'ThanksForContactingUs.html')
                 if mail_status == False:
                     return Response({"ERROR": "OOPS! an internal error occured :("}, status=status.HTTP_404_NOT_FOUND)
+                else:
+                    return Response({"status": "O.K"}, status=status.HTTP_200_OK)
                 subject = "Some user has contacted us!!!"
                 admin_emails = AdminEmailId.objects.all()
                 for reciever_mail in admin_emails:
@@ -297,10 +299,13 @@ class ValidateOTP(APIView):
                     if mail_status == False:
                         return Response({"ERROR": "OOPS! an internal error occured :("},
                                         status=status.HTTP_404_NOT_FOUND)
+                    else:
+                        return Response({"status": "O.K"}, status=status.HTTP_200_OK)
             else:
                 #ContactUs.objects.filter(device_id=device_auth, email=otp_inside[0].email).delete()
                 return Response({"status":"OTP not matching"}, status=status.HTTP_403_FORBIDDEN)
-
+        else:
+            return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
 
 def LoadDashBoard(request):
     dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
