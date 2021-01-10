@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 from django.core import serializers
-from .models import OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
+from .models import TrackNotesDownlods,OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
 from .serializers import ContactUsSerializer,TermsAndConditionsSerialier,FeedBackSerializer,NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
 from rest_framework import parsers
 from collections import namedtuple
@@ -19,8 +19,9 @@ from django.db.models import Count
 from django.db.models.functions import ExtractMonth
 from django.db.models import F
 from .automaticmail import SendEmail
-
-
+from .OTPGenerator import GenerateOTP
+from .Autherizer import AuthRequired
+from datetime import date
 import random
 import string
 
@@ -143,6 +144,7 @@ class LabManualVid(APIView):
     else:
       return Response({"ERROR":"Access Denied"}, status=status.HTTP_404_NOT_FOUND)
 
+
 class LoadSyllabusCopy(APIView):
   def get(self, request, branch, device_auth, format=None):
     if AuthRequired(device_auth) == True:
@@ -176,7 +178,19 @@ class TrackDownloads(APIView):
         if AuthRequired(device_auth) == True:
             mapped_key = DeviceAuth.objects.filter(device_key=device_auth)
             if type == 'Notes':
-                MasterNotes.objects.filter(id=id).update(downloads=F('downloads') + 1)
+                if TrackNotesDownlods.objects.filter(device_id=device_auth, notes_id=id).exists():
+                    data = TrackNotesDownlods.objects.filter(device_id=device_auth, notes_id=id)
+                    if data[0].date == date.today() and data[0].download_count < 10:
+                        MasterNotes.objects.filter(id=id).update(downloads=F('downloads') + 1)
+                        TrackNotesDownlods.objects.filter(notes_id=id,device_id=device_auth ).update(download_count=F('download_count') + 1)
+                    elif data[0].date != date.today():
+                        TrackNotesDownlods.objects.filter(notes_id=id, device_id=device_auth ).update(date=date.today())
+                        TrackNotesDownlods.objects.filter(notes_id=id,device_id=device_auth ).update(download_count=1)
+                        MasterNotes.objects.filter(id=id).update(downloads=F('downloads') + 1)
+                else:
+                    tracker = TrackNotesDownlods(device_id=device_auth, notes_id=id,download_count = 1,date = date.today() )
+                    tracker.save()
+                    MasterNotes.objects.filter(id=id).update(downloads=F('downloads') + 1)
                 return Response({"status":"O.K"}, status=status.HTTP_200_OK)
             elif type == 'Qpaper':
                 MasterQuestionPapers.objects.filter(id=id).update(downloads=F('downloads') + 1)
@@ -324,28 +338,3 @@ def LoadDashBoard(request):
     }
     return render(request, 'index.html', context)
 
-def AuthRequired(auth_key):
-  if len(auth_key) != 16:
-    return False
-  if DeviceAuth.objects.filter(device_key=auth_key).exists():
-    return True
-  else:
-    return False 
-
-def GenerateOTP(dev_id, email, name):
-    from random import randint
-    range_start = 10 ** (5 - 1)
-    range_end = (10 ** 5) - 1
-    otp = randint(range_start, range_end)
-    if OTPValidate.objects.filter(device_id=dev_id).exists():
-        OTPValidate.objects.filter(device_id=dev_id).update(otp=otp, email=email)
-    else:
-        ws_otp = OTPValidate(device_id=dev_id, otp=otp, email=email)
-        ws_otp.save()
-    context = {
-        'name': name,
-        'otp': otp
-    }
-    subject = 'Hello ' + name + ' please find the OTP'
-    mail_value = SendEmail(email, context, subject, 'OTPMail.html')
-    return mail_value

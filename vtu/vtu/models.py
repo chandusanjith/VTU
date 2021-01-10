@@ -188,3 +188,11 @@ class OTPValidate(models.Model):
   def __str__(self):
     return self.device_id + str(self.otp)
 
+class TrackNotesDownlods(models.Model):
+  device_id = models.CharField(max_length=16, default=" ")
+  notes_id = models.IntegerField(default=0)
+  download_count = models.IntegerField(default=0)
+  date = models.DateField()
+
+  def __str__(self):
+    return self.device_id + str(self.notes_id) + str(self.download_count)
