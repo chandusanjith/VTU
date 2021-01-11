@@ -6,12 +6,22 @@ from django.db.models import Count
 from django.db.models.functions import ExtractMonth
 
 def LoadDashBoard(request):
-    dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
+    #dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
+    #dat = DeviceAuth.objects.all()
+    dat = DeviceAuth.objects.all().extra({'date_created': "date(updated_on)"}).values('updated_on').annotate(created_count=Count('device_key'))
+    print(dat)
     authors_data = MasterAbout.objects.all()
     notes_count = MasterNotes.objects.all().count()
     qpaper_count = MasterQuestionPapers.objects.all().count()
     syllcopy_count = MasterSyllabusCopy.objects.all().count()
     LabManual_vidoes_added = MasterVideoLab.objects.all().count()
+    apihits = MasterServiceHits.objects.all()
+    terms  = TermsAndConditions.objects.all()
+    admin1 = AdminEmailId.objects.filter(id=1)
+    admin2 =  AdminEmailId.objects.filter(id=2)
+    sys_email = EmailConfig.objects.all()
+    app_force_update = AppForceUpdateRequired.objects.all()
+    app_version = AppVersion.objects.all()
     context={
         'device_data':dat,
         'authors_data':authors_data,
@@ -19,6 +29,13 @@ def LoadDashBoard(request):
         'syllcopy_count':syllcopy_count,
         'LabManual_vidoes_added':LabManual_vidoes_added,
         'qpaper_count':qpaper_count,
+        'apihits':apihits,
+        't_c':terms,
+        'admin1':admin1[0].mail_reciever_email,
+        'admin2': admin2[0].mail_reciever_email,
+        'sys_email':sys_email[0].email_id,
+        'app_force_update':app_force_update[0].force_update_required,
+        'app_version':app_version[0].version,
     }
     return render(request, 'index.html', context)
 

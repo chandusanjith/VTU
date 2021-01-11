@@ -34,6 +34,7 @@ class InitialLoad(APIView):
         app_version = AppVersion.objects.all()
         app_force_update = AppForceUpdateRequired.objects.all()
         mapped_key = DeviceAuth.objects.filter(device_key = device_auth)
+        print(mapped_key[0].updated_on)
         return Response({"Auth_key":mapped_key[0].mapped_key,
                         "app_version":app_version[0].version,
                         "app_force_update":app_force_update[0].force_update_required,
@@ -45,6 +46,7 @@ class InitialLoad(APIView):
          app_version = AppVersion.objects.all()
          app_force_update = AppForceUpdateRequired.objects.all()
          mapped_key = DeviceAuth.objects.filter(device_key = device_auth)
+         print(mapped_key[0].updated_on)
          return Response({"Auth_key":mapped_key[0].mapped_key,
                         "app_version":app_version[0].version,
                         "app_force_update":app_force_update[0].force_update_required,
