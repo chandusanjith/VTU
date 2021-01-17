@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 
 from django.forms import TextInput, Textarea
-from .models import OTPValidate,ContactUs,TermsAndConditions,AdminEmailId,EmailConfig,FeedBackForm,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers,MasterVideoLab,AppForceUpdateRequired,AppVersion,DeviceAuth,MasterSyllabusCopy,MasterAbout
+from .models import NewNotes,OTPValidate,ContactUs,TermsAndConditions,AdminEmailId,EmailConfig,FeedBackForm,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers,MasterVideoLab,AppForceUpdateRequired,AppVersion,DeviceAuth,MasterSyllabusCopy,MasterAbout
 from django.forms import Textarea
 
 class TermsAndConditionsAdmin(admin.ModelAdmin):
@@ -29,3 +29,4 @@ admin.site.register(AdminEmailId)
 admin.site.register(TermsAndConditions, TermsAndConditionsAdmin)
 admin.site.register(ContactUs)
 admin.site.register(OTPValidate)
+admin.site.register(NewNotes)

@@ -1,9 +1,13 @@
-from .models import TrackNotesDownlods,OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
+from .models import NewNotes,TrackNotesDownlods,OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
 from django.contrib import admin
 from django.shortcuts import render
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.db.models.functions import ExtractMonth
+from .Autherizer import AuthRequired
+from django.http import HttpResponseRedirect, JsonResponse
+from django.core.exceptions import PermissionDenied
+
 
 def LoadDashBoard(request):
     #dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
@@ -45,3 +49,29 @@ def LoadAboutus(request):
     return render(request, 'AboutUs.html')
 def LoadTerms(request):
     return render(request, 'Terms_of_use.html')
+def ThankYou(request):
+    return render(request,'ThankYou.html')
+def UserNotesUpload(request, id, device_auth):
+    if AuthRequired(device_auth) == True:
+        if request.method == "GET":
+            contact_details = ContactUs.objects.filter(id=id)
+            context = {
+                'name': contact_details[0].name,
+                'contact': contact_details[0].contact,
+                'email': contact_details[0].email,
+                'id':id,
+                'device_id':device_auth,
+            }
+            return render(request, 'userNotesUpload.html', context)
+        else:
+            name = request.POST['name']
+            Description = request.POST['Description']
+            notes = request.FILES["upnotes"]
+            address = request.POST['address']
+            email = request.POST['email']
+            contact = request.POST['cnum']
+            a = NewNotes(Description = Description,device_id = device_auth, notes = notes, name = name, email = email, contact = contact, address = address)
+            a.save()
+            return HttpResponseRedirect('/ThankYou/')
+    else:
+        raise PermissionDenied

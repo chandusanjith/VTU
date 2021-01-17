@@ -1,4 +1,6 @@
 absl-py==0.10.0
+django-cleanup
+django-cors-headers
 aiohttp==3.6.2
 appdirs==1.4.4
 asgiref==3.3.1

@@ -297,11 +297,13 @@ class ValidateOTP(APIView):
             if otp == str(otp_inside[0].otp):
                 ContactUs.objects.filter(device_id = device_auth, email = otp_inside[0].email).update(user_verified = True)
                 contact_details = ContactUs.objects.filter(device_id = device_auth, email = otp_inside[0].email)
+                link = 'https://vtu.pythonanywhere.com/UserNotesUpload/'+str(contact_details[0].id)+'/'+contact_details[0].device_id
                 context = {
                     'name':contact_details[0].name,
                     'contact': contact_details[0].contact,
                     'email':otp_inside[0].email,
                     'message':contact_details[0].user_message,
+                    'link':link,
                 }
                 subject = 'Thanks for contacting us!'
                 mail_status = SendEmail(otp_inside[0].email, context, subject, 'ThanksForContactingUs.html')

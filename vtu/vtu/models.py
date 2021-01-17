@@ -200,3 +200,15 @@ class TrackNotesDownlods(models.Model):
 
   def __str__(self):
     return self.device_id + str(self.notes_id) + str(self.download_count)
+
+class NewNotes(models.Model):
+  device_id = models.CharField(max_length=16, default=" ")
+  notes =  models.FileField(blank=True, null=True)
+  name = models.CharField(max_length=40, default=" ")
+  email = models.CharField(max_length=40, default=" ")
+  contact = models.CharField(max_length=15, default=" ")
+  address = models.CharField(max_length=240, default=" ")
+  Description = models.CharField(max_length=240, default=" ")
+
+  def __str__(self):
+    return self.name
