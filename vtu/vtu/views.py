@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 from django.core import serializers
-from .models import TrackNotesDownlods,OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
-from .serializers import ContactUsSerializer,TermsAndConditionsSerialier,FeedBackSerializer,NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
+from .models import TrackerOTPValidate,EmailUniqueidMapper,TrackNotesDownlods,OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
+from .serializers import NotesTrackerSerializer,ContactUsSerializer,TermsAndConditionsSerialier,FeedBackSerializer,NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
 from rest_framework import parsers
 from collections import namedtuple
 from django.contrib import admin
@@ -249,22 +249,16 @@ class LoadFeedBack(APIView):
 class ContactUS(APIView):
 
     def post(self, request, format=None):
-        print("coming here 1")
         if AuthRequired(request.data['device_id']) == True:
-            print("coming here 2")
             if ContactUs.objects.filter(device_id = request.data['device_id']).exists():
-                print("coming here 3")
                 old_contact_data = ContactUs.objects.filter(device_id = request.data['device_id'])
                 if old_contact_data[0].email != request.data['email']:
-                    print("coming here 5")
                     ContactUs.objects.filter(device_id=request.data['device_id']).update(user_verified = False)
                 ContactUs.objects.filter(device_id=request.data['device_id']).update(name=request.data['name'],
                                                                                      email=request.data['email'],
                                                                                      contact=request.data['contact'],
                                                                                      user_message=request.data['user_message'])
-                print("coming here 6")
                 if ContactUs.objects.filter(device_id = request.data['device_id'], user_verified = False):
-                    print("coming here 7")
                     response = GenerateOTP(request.data['device_id'],request.data['email'], request.data['name'])
                     if response == True:
                         return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
@@ -272,16 +266,12 @@ class ContactUS(APIView):
                         return Response({"ERROR": "OOPS! an internal error occured :("},
                                             status=status.HTTP_404_NOT_FOUND)
                 else:
-                    print("coming here 8")
                     return Response({"status": "User has been verified, no need of otp validation"}, status=status.HTTP_200_OK)
             else:
-                print("coming here 9")
                 serializer = ContactUsSerializer(data=request.data)
                 if serializer.is_valid():
                     serializer.save()
-                print("coming here 10")
-                response = GenerateOTP(request.data['device_id'], request.data['email'], request.data['name'])
-                print("coming here 11")
+                response = GenerateOTP(request.data['device_id'], request.data['email'], request.data['name'], 'C')
                 if response == True:
                     return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
                 else:
@@ -309,8 +299,6 @@ class ValidateOTP(APIView):
                 mail_status = SendEmail(otp_inside[0].email, context, subject, 'ThanksForContactingUs.html')
                 if mail_status == False:
                     return Response({"ERROR": "OOPS! an internal error occured :("}, status=status.HTTP_404_NOT_FOUND)
-                else:
-                    return Response({"status": "O.K"}, status=status.HTTP_200_OK)
                 subject = "Some user has contacted us!!!"
                 admin_emails = AdminEmailId.objects.all()
                 for reciever_mail in admin_emails:
@@ -326,3 +314,51 @@ class ValidateOTP(APIView):
         else:
             return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
 
+class NotesTracker(APIView):
+    def get(self, request, type, email_uniqueid, device_auth, format=None):
+        if AuthRequired(device_auth) == True:
+            if type == 'OLD':
+                unique_id = email_uniqueid
+                mappedData = EmailUniqueidMapper.objects.filter(mapped_id = unique_id)
+                email = mappedData[0].email
+                notesInfo = MasterNotes.objects.filter(owner_email = email)
+                if not notesInfo:
+                    return Response({"ERROR":"404 NO DATA FOUND :(",
+                                     "Mapped_key": unique_id}, status=status.HTTP_404_NOT_FOUND)
+                notesTrackerSerializer = NotesTrackerSerializer(notesInfo, many=True, context={'Device_key': device_auth,
+                                                                                               'Mapped_Key': unique_id}).data
+                return Response(notesTrackerSerializer, status=status.HTTP_200_OK)
+            elif type == "NEW":
+                email = email_uniqueid
+                response = GenerateOTP(device_auth, email, "user", "N")
+                if response == True:
+                    return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"ERROR": "OOPS! an internal error occured :("},
+                                    status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({"ERROR": "OOPS! an internal error occured :("},
+                                status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
+
+class TrackerOTPValidater(APIView):
+    def get(self, request, otp, email, device_auth, format=None):
+        if AuthRequired(device_auth) == True:
+            otp_inside = TrackerOTPValidate.objects.filter(email=email)
+            if otp == str(otp_inside[0].otp):
+                mapped_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
+                mappedData = EmailUniqueidMapper(mapped_id=mapped_id, email=email)
+                mappedData.save()
+                notesInfo = MasterNotes.objects.filter(owner_email=email)
+                if not notesInfo:
+                    return Response({"ERROR": "404 NO DATA FOUND :(",
+                                     "Mapped_key": mapped_id}, status=status.HTTP_404_NOT_FOUND)
+                notesTrackerSerializer = NotesTrackerSerializer(notesInfo, many=True,
+                                                                context={'Device_key': device_auth,
+                                                                         'Mapped_Key': mapped_id}).data
+                return Response(notesTrackerSerializer, status=status.HTTP_200_OK)
+            else:
+                return Response({"status": "OTP not matching"}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)

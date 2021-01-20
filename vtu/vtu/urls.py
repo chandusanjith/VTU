@@ -19,8 +19,13 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from vtu import views, template_views
 from django.conf.urls.static import static
 from django.conf import settings
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='VTU Free Notes API Documentation')
+
 
 urlpatterns = [
+    path('swagger/apiv1/Doc', schema_view),
     path('admin/', admin.site.urls),
     path('apiv1/InitialLoad/<device_auth>', views.InitialLoad.as_view()),
     path('apiv1/LoadMasterData/<device_auth>', views.FetchMasterList.as_view()),
@@ -35,6 +40,10 @@ urlpatterns = [
     path('apiv1/GetTerms/<device_auth>', views.LoadFeedBack.as_view()),
     path('apiv1/ContactUS', views.ContactUS.as_view()),
     path('apiv1/ValidateOTP/<otp>/<device_auth>', views.ValidateOTP.as_view()),
+    path('apiv1/NotesTracker/<type>/<email_uniqueid>/<device_auth>', views.NotesTracker.as_view()),
+    path('apiv1/TrackerOTP/<otp>/<email>/<device_auth>', views.TrackerOTPValidater.as_view()),
+    # API ENDS HERE
+    #TEMPLATE RENDERING STARTS HERE
     path('Dashboard', template_views.LoadDashBoard),
     path('PrivacyPolicy', template_views.LoadPrivacyPolicy),
     path('Terms', template_views.LoadTerms),

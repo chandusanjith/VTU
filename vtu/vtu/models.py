@@ -33,6 +33,7 @@ class MasterSubjects(models.Model):
 
 class MasterNotes(models.Model):
   owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='Notes_owner')
+  owner_email = models.CharField(max_length=60, default=" ")
   semester = models.ForeignKey(MasterSemesters, on_delete=models.CASCADE, related_name='Semester_owner', null=True)
   branch = models.ForeignKey(MasterBranches, on_delete=models.CASCADE, related_name='Branch_owner', null=True)
   author = models.CharField(max_length=40, default=" ")
@@ -212,3 +213,18 @@ class NewNotes(models.Model):
 
   def __str__(self):
     return self.name
+
+class EmailUniqueidMapper(models.Model):
+  email = models.CharField(max_length=40, default=" ")
+  mapped_id = models.CharField(max_length=16, default=" ")
+
+  def __str__(self):
+    return self.email + '-' + self.mapped_id
+
+class TrackerOTPValidate(models.Model):
+  otp = models.IntegerField(default=0)
+  email = models.CharField(max_length=40, default=" ")
+  updated_on = models.DateField(auto_now_add=True)
+
+  def __str__(self):
+    return self.email + '-' + self.otp

@@ -16,6 +16,22 @@ class NotesSerializer(serializers.ModelSerializer):
     def get_type(self, request):
         return "Notes"
 
+class NotesTrackerSerializer(serializers.ModelSerializer):
+    Auth_key = serializers.SerializerMethodField(read_only=True)
+    Mapped_Key = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = MasterNotes
+        fields = ('id','Description','downloads','Mapped_Key','Auth_key')
+
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
+
+    def get_Mapped_Key(self,request):
+      mapped_key = self.context.get("Mapped_Key")
+      return mapped_key
+
 class QuestionPaperSerializer(serializers.ModelSerializer):
     Auth_key = serializers.SerializerMethodField(read_only=True)
     type = serializers.SerializerMethodField(read_only=True)
