@@ -319,7 +319,11 @@ class NotesTracker(APIView):
         if AuthRequired(device_auth) == True:
             if type == 'OLD':
                 unique_id = email_uniqueid
-                mappedData = EmailUniqueidMapper.objects.filter(mapped_id = unique_id)
+                if EmailUniqueidMapper.objects.filter(mapped_id = unique_id).exists():
+                    mappedData = EmailUniqueidMapper.objects.filter(mapped_id = unique_id)
+                else:
+                    return Response({"ERROR": "Type and Mapped Key not matching :("},
+                                    status=status.HTTP_404_NOT_FOUND)
                 email = mappedData[0].email
                 notesInfo = MasterNotes.objects.filter(owner_email = email)
                 if not notesInfo:
