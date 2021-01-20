@@ -11,8 +11,14 @@ class TermsAndConditionsAdmin(admin.ModelAdmin):
         models.TextField: {'widget': Textarea(attrs={'rows':4, 'cols':40})},
     }
 
+class MasterNotesAdmin(admin.ModelAdmin):
+    list_display = ('owner', 'owner_email','semester', 'branch','author', 'subject','file', 'file_snippet','Description', 'downloads',)
+    list_filter = (
+        ('subject', admin.RelatedOnlyFieldListFilter),
+    )
 
-admin.site.register(MasterNotes)
+#admin.site.register(MasterNotes)
+admin.site.register(MasterNotes, MasterNotesAdmin)
 admin.site.register(MasterBranches)
 admin.site.register(MasterSemesters)
 admin.site.register(MasterSubjects)
