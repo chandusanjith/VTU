@@ -1,31 +1,30 @@
+#### Using username "ubuntu".
+#### Authenticating with public key "imported-openssh-key"
+#### Welcome to Ubuntu 20.04.1 LTS (GNU/Linux 5.4.0-1029-aws x86_64)
 
-# VTU API
-### Send get request using the url : https://vtu.pythonanywhere.com/apiv1/LoadMasterData/1234567891234567
-here 1234567891234567 ---> is unique devuce id (it supports varchars)
+#### * Documentation:  https://help.ubuntu.com
+#### * Management:     https://landscape.canonical.com
+#### * Support:        https://ubuntu.com/advantage
 
-### Response
+####  System information as of Wed Jan 20 19:02:45 UTC 2021
 
-![alt text](https://github.com/chandusanjith/VTU/blob/master/vtu1.png?raw=true)
+####  System load:  0.0               Processes:             113
+####  Usage of /:   27.7% of 7.69GB   Users logged in:       0
+####  Memory usage: 41%               IPv4 address for eth0: 172.31.26.210
+####  Swap usage:   0%
 
-### Now send get request using branch and semester as parameters to get subjects list:
-#### https://vtu.pythonanywhere.com/apiv1/Subjects/3rd%20SEMESTER/Information%20Science%20&%20Engineering/<device_id>
-### Response:
-![alt text](https://github.com/chandusanjith/VTU/blob/master/vtu2.png?raw=true)
-
-### Now send get request using branch, semester, subject-code as parameters to get notes related raw data:
-#### https://vtu.pythonanywhere.com/apiv1/Notes/3rd%20SEMESTER/Information%20Science%20&%20Engineering/analog%20engineering/<device_id>
-
-### Response:
-
-![alt text](https://github.com/chandusanjith/VTU/blob/master/vtu3.png?raw=true)
-
-
-
-### LabManual video featre API end API
-
-### https://vtu.pythonanywhere.com/apiv1/LabVid/3rd%20SEMESTER/Information%20Science%20&%20Engineering/Analog%20and%20Digital%20Electronics%20Laboratory/1/<device_id>
+#### * Introducing self-healing high availability clusters in MicroK8s.
 
 ### from now without device id my backend will not process any request.
+
+# *******************************************************************************************
+# Important note:
+## Below api description is to know why and how to use the API's.
+## If you want to test the API's then goto https://vtu.pythonanywhere.com/swagger/apiv1/Doc which is staging.
+## From next update staging app data will be syncing with production app data.
+## All the testing should be done in staging app only.
+# ********************************************************************************************
+
 
 
 ##  https://vtu.pythonanywhere.com/apiv1/InitialLoad/device_auth
@@ -85,3 +84,10 @@ here 1234567891234567 ---> is unique devuce id (it supports varchars)
 
 #### https://vtu.pythonanywhere.com/apiv1/ValidateOTP/otp>/device_auth
 ### using this send me the otp and dev id.
+
+#### https://vtu.pythonanywhere.com/NotesTracker/type/email_uniqueid/device_auth 
+### Here send me type of user ("NEW" --> If mapped key not found, "OLD" --> If mapped key found).
+### email_uniqueid --> Here if type is "NEW" send me email in this field, If type is "OLD" send me mapped_id in this field.
+
+#### https://vtu.pythonanywhere.com/apiv1/TrackerOTP/otp/email/device_auth
+### Here if you got "OTP Has been shared" in NotesTracker API then send me otp with email here
