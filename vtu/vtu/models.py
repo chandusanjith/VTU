@@ -228,3 +228,22 @@ class TrackerOTPValidate(models.Model):
 
   def __str__(self):
     return self.email + '-' + self.otp
+
+class PaymentNotesDownloadTracker(models.Model):
+  notesID = models.IntegerField(default=0)
+  initialViews = models.IntegerField(default=0)
+  maxViews = models.IntegerField(default=0)
+  updated_on = models.DateField(auto_now_add=True)
+
+class PaymentParameter(models.Model):
+  notesInitialAmt = models.DecimalField(max_digits=12, decimal_places=2)
+  totEligibleViews = models.IntegerField(default=0)
+  eligibleViewsAmt = models.DecimalField(max_digits=12, decimal_places=2)
+  validViews = models.IntegerField(default=0)
+  minRedeemAmt = models.DecimalField(max_digits=12, decimal_places=2)
+  updated_on = models.DateField(auto_now_add=True)
+
+class UserMoneyBucket(models.Model):
+  email = models.CharField(max_length=40, default=" ")
+  totAmountEarned = models.DecimalField(max_digits=12, decimal_places=2)
+  totAmountRedeemed = models.DecimalField(max_digits=12, decimal_places=2)

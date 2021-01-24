@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 
 from django.forms import TextInput, Textarea
-from .models import NewNotes,OTPValidate,ContactUs,TermsAndConditions,AdminEmailId,EmailConfig,FeedBackForm,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers,MasterVideoLab,AppForceUpdateRequired,AppVersion,DeviceAuth,MasterSyllabusCopy,MasterAbout
+from .models import EmailUniqueidMapper,PaymentNotesDownloadTracker,PaymentParameter,UserMoneyBucket,NewNotes,OTPValidate,ContactUs,TermsAndConditions,AdminEmailId,EmailConfig,FeedBackForm,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers,MasterVideoLab,AppForceUpdateRequired,AppVersion,DeviceAuth,MasterSyllabusCopy,MasterAbout
 from django.forms import Textarea
 
 class TermsAndConditionsAdmin(admin.ModelAdmin):
@@ -12,12 +12,17 @@ class TermsAndConditionsAdmin(admin.ModelAdmin):
     }
 
 class MasterNotesAdmin(admin.ModelAdmin):
-    list_display = ('owner', 'owner_email','semester', 'branch','author', 'subject','file', 'file_snippet','Description', 'downloads',)
+    list_display = ('id','owner', 'owner_email','semester', 'branch','author', 'subject','file', 'file_snippet','Description', 'downloads',)
     list_filter = (
         ('subject', admin.RelatedOnlyFieldListFilter),
     )
 
+
+admin.site.register(EmailUniqueidMapper)
 #admin.site.register(MasterNotes)
+admin.site.register(PaymentNotesDownloadTracker)
+admin.site.register(PaymentParameter)
+admin.site.register(UserMoneyBucket)
 admin.site.register(MasterNotes, MasterNotesAdmin)
 admin.site.register(MasterBranches)
 admin.site.register(MasterSemesters)

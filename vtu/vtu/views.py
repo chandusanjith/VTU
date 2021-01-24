@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 from django.core import serializers
-from .models import TrackerOTPValidate,EmailUniqueidMapper,TrackNotesDownlods,OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
-from .serializers import NotesTrackerSerializer,ContactUsSerializer,TermsAndConditionsSerialier,FeedBackSerializer,NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
+from .models import UserMoneyBucket,TrackerOTPValidate,EmailUniqueidMapper,TrackNotesDownlods,OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
+from .serializers import TrackMasterSerializer,NotesTrackerSerializer,ContactUsSerializer,TermsAndConditionsSerialier,FeedBackSerializer,NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
 from rest_framework import parsers
 from collections import namedtuple
 from django.contrib import admin
@@ -21,6 +21,7 @@ from django.db.models import F
 from .automaticmail import SendEmail
 from .OTPGenerator import GenerateOTP
 from .Autherizer import AuthRequired
+from .monetize import MonetizeNotes
 from datetime import date
 import random
 import string
@@ -180,6 +181,7 @@ class TrackDownloads(APIView):
         if AuthRequired(device_auth) == True:
             mapped_key = DeviceAuth.objects.filter(device_key=device_auth)
             if type == 'Notes':
+                MonetizeNotes(id)
                 if TrackNotesDownlods.objects.filter(device_id=device_auth, notes_id=id).exists():
                     data = TrackNotesDownlods.objects.filter(device_id=device_auth, notes_id=id)
                     if data[0].date == date.today() and data[0].download_count < 10:
@@ -325,11 +327,17 @@ class NotesTracker(APIView):
                     return Response({"ERROR": "Type and Mapped Key not matching :("},
                                     status=status.HTTP_404_NOT_FOUND)
                 email = mappedData[0].email
-                notesInfo = MasterNotes.objects.filter(owner_email = email)
-                if not notesInfo:
+                TrackerRecords = namedtuple('TrackerRecords', ('NotesTrack', 'Earnings'))
+                Tracker = TrackerRecords(
+                    NotesTrack=MasterNotes.objects.filter(owner_email = email),
+                    Earnings=UserMoneyBucket.objects.filter(email = email),
+                )
+                if not Tracker:
                     return Response({"ERROR":"404 NO DATA FOUND :(",
                                      "Mapped_key": unique_id}, status=status.HTTP_404_NOT_FOUND)
-                notesTrackerSerializer = NotesTrackerSerializer(notesInfo, many=True, context={'Device_key': device_auth,
+                #serializer = TrackMasterSerializer(Tracker, context={'Device_key': device_auth}
+                                                   #).data
+                notesTrackerSerializer = TrackMasterSerializer(Tracker, context={'Device_key': device_auth,
                                                                                                'Mapped_Key': unique_id}).data
                 return Response(notesTrackerSerializer, status=status.HTTP_200_OK)
             elif type == "NEW":
@@ -354,13 +362,18 @@ class TrackerOTPValidater(APIView):
                 mapped_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
                 mappedData = EmailUniqueidMapper(mapped_id=mapped_id, email=email)
                 mappedData.save()
-                notesInfo = MasterNotes.objects.filter(owner_email=email)
-                if not notesInfo:
+                TrackerRecords = namedtuple('TrackerRecords', ('NotesTrack', 'Earnings'))
+                Tracker = TrackerRecords(
+                    NotesTrack=MasterNotes.objects.filter(owner_email=email),
+                    Earnings=UserMoneyBucket.objects.filter(email=email),
+                )
+                if not Tracker:
                     return Response({"ERROR": "404 NO DATA FOUND :(",
                                      "Mapped_key": mapped_id}, status=status.HTTP_404_NOT_FOUND)
-                notesTrackerSerializer = NotesTrackerSerializer(notesInfo, many=True,
-                                                                context={'Device_key': device_auth,
-                                                                         'Mapped_Key': mapped_id}).data
+                # serializer = TrackMasterSerializer(Tracker, context={'Device_key': device_auth}
+                # ).data
+                notesTrackerSerializer = TrackMasterSerializer(Tracker, context={'Device_key': device_auth,
+                                                                                 'Mapped_Key': mapped_id}).data
                 return Response(notesTrackerSerializer, status=status.HTTP_200_OK)
             else:
                 return Response({"status": "OTP not matching"}, status=status.HTTP_403_FORBIDDEN)

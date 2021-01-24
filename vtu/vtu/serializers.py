@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ContactUs,TermsAndConditions,FeedBackForm,MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab, MasterSyllabusCopy,MasterAbout,DeviceAuth
+from .models import UserMoneyBucket,EmailUniqueidMapper,ContactUs,TermsAndConditions,FeedBackForm,MasterNotes, MasterBranches, MasterSemesters, MasterSubjects, MasterQuestionPapers, MasterVideoLab, MasterSyllabusCopy,MasterAbout,DeviceAuth
 
 
 class NotesSerializer(serializers.ModelSerializer):
@@ -19,6 +19,7 @@ class NotesSerializer(serializers.ModelSerializer):
 class NotesTrackerSerializer(serializers.ModelSerializer):
     Auth_key = serializers.SerializerMethodField(read_only=True)
     Mapped_Key = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = MasterNotes
         fields = ('id','Description','downloads','Mapped_Key','Auth_key')
@@ -31,6 +32,27 @@ class NotesTrackerSerializer(serializers.ModelSerializer):
     def get_Mapped_Key(self,request):
       mapped_key = self.context.get("Mapped_Key")
       return mapped_key
+
+class PaymentSerializer(serializers.ModelSerializer):
+    Auth_key = serializers.SerializerMethodField(read_only=True)
+    Mapped_Key = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = UserMoneyBucket
+        fields = ('totAmountRedeemed','totAmountEarned','Mapped_Key','Auth_key')
+
+    def get_Auth_key(self,request):
+      Device_key = self.context.get("Device_key")
+      mapped_key = DeviceAuth.objects.filter(device_key = Device_key)
+      return mapped_key[0].mapped_key
+
+    def get_Mapped_Key(self,request):
+      mapped_key = self.context.get("Mapped_Key")
+      return mapped_key
+
+class TrackMasterSerializer(serializers.Serializer):
+    NotesTrack = NotesTrackerSerializer(many=True)
+    Earnings = PaymentSerializer(many=True)
 
 class QuestionPaperSerializer(serializers.ModelSerializer):
     Auth_key = serializers.SerializerMethodField(read_only=True)
