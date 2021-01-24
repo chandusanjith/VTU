@@ -22,6 +22,19 @@ def MonetizeNotes(id):
             PaymentNotesDownloadTracker.objects.filter(notesID=id).update(initialViews=F('initialViews') + 1)
         elif trackerData[0].initialViews > paymentData[0].totEligibleViews and trackerData[0].initialViews != 999:
             PaymentNotesDownloadTracker.objects.filter(notesID=id).update(initialViews=999)
+            UserMoneyBucket.objects.filter(email=email).update(
+                totAmountEarned=F('totAmountEarned') + paymentData[0].notesInitialAmt)
+            amtData = UserMoneyBucket.objects.filter(email=email)
+            context = {
+                'amount': paymentData[0].notesInitialAmt,
+                'tot_earnings': amtData[0].totAmountEarned,
+                'wallet': amtData[0].totAmountRedeemed,
+                'min_redeem': paymentData[0].minRedeemAmt,
+                'eligible_views': paymentData[0].totEligibleViews,
+                'earning_show': "1"
+            }
+            subject = 'Hurray you just earned ' + str(paymentData[0].notesInitialAmt) + ' from VTU FREE NOTES.'
+            SendEmail(email, context, subject, 'EarningNotify.html')
         else:
             pass
 
@@ -38,7 +51,9 @@ def MonetizeNotes(id):
                 'amount':paymentData[0].eligibleViewsAmt,
                 'tot_earnings': amtData[0].totAmountEarned,
                 'wallet': amtData[0].totAmountRedeemed,
-                'min_redeem': paymentData[0].minRedeemAmt
+                'min_redeem': paymentData[0].minRedeemAmt,
+                'eligible_views':paymentData[0].totEligibleViews,
+                'earning_show': "1"
             }
             subject = 'Hurray you just earned ' + str(paymentData[0].eligibleViewsAmt) + ' from VTU FREE NOTES.'
             SendEmail(email, context, subject, 'EarningNotify.html')
@@ -47,15 +62,15 @@ def MonetizeNotes(id):
     else:
         Payments = PaymentNotesDownloadTracker(notesID = id,initialViews = 1, maxViews = 1)
         Payments.save()
-        UserMoneyBucket.objects.filter(email=email).update(
-            totAmountEarned=F('totAmountEarned') + paymentData[0].notesInitialAmt)
         amtData = UserMoneyBucket.objects.filter(email=email)
         context = {
             'amount': paymentData[0].notesInitialAmt,
             'tot_earnings': amtData[0].totAmountEarned,
             'wallet': amtData[0].totAmountRedeemed,
-            'min_redeem': paymentData[0].minRedeemAmt
+            'min_redeem': paymentData[0].minRedeemAmt,
+            'eligible_views': paymentData[0].totEligibleViews,
+            'earning_show':"0",
         }
-        subject = 'Hurray you just earned ' + str(paymentData[0].notesInitialAmt) + ' from VTU FREE NOTES.'
+        subject = 'Hurray your notes was approved from VTU FREE NOTES.'
         SendEmail(email, context, subject, 'EarningNotify.html')
     return True

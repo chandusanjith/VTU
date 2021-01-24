@@ -109,12 +109,19 @@
                                       </tr>
                                       <tr>
                                         <td align='left' style='font-size:0px;padding:10px 25px;padding-bottom:50px;padding-top:00px;word-break:break-word;'>
+                                          {% if earnings_show == '1' %}
                                           <div style='color:#000000;font-family:Martel;font-size:56px;font-weight:900;line-height:72px;text-align:left;'>
                                             Hurray!! You just earned ₹ {{amount}} from VTU Free Notes.
                                             Your total earnings: ₹{{tot_earnings}}
                                             Amount in your Wallet: ₹{{wallet}}
                                             YOU CAN REDEEM THE AMOUNT ONCE IT REACHES ₹{{min_redeem}} OR ABOVE
                                           </div>
+                                          {% endif %}
+                                          {% if earning_show == '0' %}
+                                          <div style='color:#000000;font-family:Martel;font-size:56px;font-weight:900;line-height:72px;text-align:left;'>
+                                            Congratulations your notes was uploaded successfully, you will get ₹ {{amount}} when your notes reach ₹{{eligible_views}} views.
+                                          </div>
+                                          {% endif %}
                                         </td>
                                       </tr>
                                       <tr>
