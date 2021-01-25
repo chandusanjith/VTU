@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 
 from django.forms import TextInput, Textarea
-from .models import EmailUniqueidMapper,PaymentNotesDownloadTracker,PaymentParameter,UserMoneyBucket,NewNotes,OTPValidate,ContactUs,TermsAndConditions,AdminEmailId,EmailConfig,FeedBackForm,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterQuestionPapers,MasterVideoLab,AppForceUpdateRequired,AppVersion,DeviceAuth,MasterSyllabusCopy,MasterAbout
+from .models import *
 from django.forms import Textarea
 
 class TermsAndConditionsAdmin(admin.ModelAdmin):
@@ -19,6 +19,7 @@ class MasterNotesAdmin(admin.ModelAdmin):
 
 
 admin.site.register(EmailUniqueidMapper)
+admin.site.register(PaymentPassBook)
 #admin.site.register(MasterNotes)
 admin.site.register(PaymentNotesDownloadTracker)
 admin.site.register(PaymentParameter)

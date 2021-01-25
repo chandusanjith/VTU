@@ -1,22 +1,15 @@
-from django.urls import path, include
-from django.http import HttpResponse, FileResponse
-from django.contrib.auth.models import User
-from rest_framework import routers, serializers, viewsets
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework import status
 import json
 from django.core import serializers
-from .models import UserMoneyBucket,TrackerOTPValidate,EmailUniqueidMapper,TrackNotesDownlods,OTPValidate,ContactUs,TermsAndConditions, AdminEmailId, EmailConfig,MasterSemesters,MasterBranches,MasterNotes, MasterSubjects, MasterServiceHits,MasterQuestionPapers, MasterVideoLab, DeviceAuth, AppVersion, AppForceUpdateRequired, MasterSyllabusCopy,MasterAbout
-from .serializers import TrackMasterSerializer,NotesTrackerSerializer,ContactUsSerializer,TermsAndConditionsSerialier,FeedBackSerializer,NotesSerializer, NotesMasterSerializer, SubjectSerializer, QuestionPaperSerializer, MasterVideoLabSerializer, LoadSyllabusCopySerializer,MasterAboutSerializer
+from .models import *
+from .serializers import *
 from rest_framework import parsers
 from collections import namedtuple
 from django.contrib import admin
-from django.shortcuts import render
-from django.db.models.functions import TruncMonth
 from django.db.models import Count
-from django.db.models.functions import ExtractMonth
 from django.db.models import F
 from .automaticmail import SendEmail
 from .OTPGenerator import GenerateOTP
@@ -261,7 +254,7 @@ class ContactUS(APIView):
                                                                                      contact=request.data['contact'],
                                                                                      user_message=request.data['user_message'])
                 if ContactUs.objects.filter(device_id = request.data['device_id'], user_verified = False):
-                    response = GenerateOTP(request.data['device_id'],request.data['email'], request.data['name'])
+                    response = GenerateOTP(request.data['device_id'],request.data['email'], request.data['name'], 'C')
                     if response == True:
                         return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
                     else:
@@ -289,7 +282,7 @@ class ValidateOTP(APIView):
             if otp == str(otp_inside[0].otp):
                 ContactUs.objects.filter(device_id = device_auth, email = otp_inside[0].email).update(user_verified = True)
                 contact_details = ContactUs.objects.filter(device_id = device_auth, email = otp_inside[0].email)
-                link = 'https://vtu.pythonanywhere.com/UserNotesUpload/'+str(contact_details[0].id)+'/'+contact_details[0].device_id
+                link = 'http://34.219.72.32/UserNotesUpload/'+str(contact_details[0].id)+'/'+contact_details[0].device_id
                 context = {
                     'name':contact_details[0].name,
                     'contact': contact_details[0].contact,
@@ -338,7 +331,8 @@ class NotesTracker(APIView):
                 #serializer = TrackMasterSerializer(Tracker, context={'Device_key': device_auth}
                                                    #).data
                 notesTrackerSerializer = TrackMasterSerializer(Tracker, context={'Device_key': device_auth,
-                                                                                               'Mapped_Key': unique_id}).data
+                                                                                 'Mapped_Key': unique_id,
+                                                                                 'Email': email}).data
                 return Response(notesTrackerSerializer, status=status.HTTP_200_OK)
             elif type == "NEW":
                 email = email_uniqueid

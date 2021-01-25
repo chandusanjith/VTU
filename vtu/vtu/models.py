@@ -247,3 +247,11 @@ class UserMoneyBucket(models.Model):
   email = models.CharField(max_length=40, default=" ")
   totAmountEarned = models.DecimalField(max_digits=12, decimal_places=2)
   totAmountRedeemed = models.DecimalField(max_digits=12, decimal_places=2)
+
+class PaymentPassBook(models.Model):
+  email = models.CharField(max_length=40, default=" ")
+  credit = models.DecimalField(max_digits=12, decimal_places=2)
+  debit = models.DecimalField(max_digits=12, decimal_places=2)
+  currBalance = models.DecimalField(max_digits=12, decimal_places=2)
+  narration = models.CharField(max_length=400, default=" ")
+  tranDate = models.DateField(auto_now_add=True)

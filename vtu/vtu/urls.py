@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from vtu import views, template_views
+from vtu import views, template_views, monetize
 from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework_swagger.views import get_swagger_view
@@ -42,6 +42,8 @@ urlpatterns = [
     path('apiv1/ValidateOTP/<otp>/<device_auth>', views.ValidateOTP.as_view()),
     path('apiv1/NotesTracker/<type>/<email_uniqueid>/<device_auth>', views.NotesTracker.as_view()),
     path('apiv1/TrackerOTP/<otp>/<email>/<device_auth>', views.TrackerOTPValidater.as_view()),
+    path('apiv1/Redeem/<mapped_key>/<device_auth>', monetize.RedeemAmount.as_view()),
+    path('apiv1/Statement/<mapped_key>/<device_auth>', monetize.GenerateStatements.as_view()),
     # API ENDS HERE
     #TEMPLATE RENDERING STARTS HERE
     path('Dashboard', template_views.LoadDashBoard),
