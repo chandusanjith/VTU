@@ -21,11 +21,11 @@ def LoadDashBoard(request):
     LabManual_vidoes_added = MasterVideoLab.objects.all().count()
     apihits = MasterServiceHits.objects.all()
     terms  = TermsAndConditions.objects.all()
-    admin1 = AdminEmailId.objects.filter(id=1)
-    admin2 =  AdminEmailId.objects.filter(id=2)
-    sys_email = EmailConfig.objects.all()
-    app_force_update = AppForceUpdateRequired.objects.all()
-    app_version = AppVersion.objects.all()
+    admin1 = AdminEmailId.objects.filter(id=1).first()
+    admin2 =  AdminEmailId.objects.filter(id=2).first()
+    sys_email = EmailConfig.objects.filter(id=1).first()
+    app_force_update = AppForceUpdateRequired.objects.filter(id=1).first()
+    app_version = AppVersion.objects.filter(id=1).first()
     context={
         'device_data':dat,
         'authors_data':authors_data,
@@ -35,11 +35,11 @@ def LoadDashBoard(request):
         'qpaper_count':qpaper_count,
         'apihits':apihits,
         't_c':terms,
-        'admin1':admin1[0].mail_reciever_email,
-        'admin2': admin2[0].mail_reciever_email,
-        'sys_email':sys_email[0].email_id,
-        'app_force_update':app_force_update[0].force_update_required,
-        'app_version':app_version[0].version,
+        'admin1':admin1.mail_reciever_email,
+        'admin2': admin2.mail_reciever_email,
+        'sys_email':sys_email.email_id,
+        'app_force_update':app_force_update.force_update_required,
+        'app_version':app_version.version,
     }
     return render(request, 'index.html', context)
 
@@ -54,11 +54,11 @@ def ThankYou(request):
 def UserNotesUpload(request, id, device_auth):
     if AuthRequired(device_auth) == True:
         if request.method == "GET":
-            contact_details = ContactUs.objects.filter(id=id)
+            contact_details = ContactUs.objects.filter(id=id).first()
             context = {
-                'name': contact_details[0].name,
-                'contact': contact_details[0].contact,
-                'email': contact_details[0].email,
+                'name': contact_details.name,
+                'contact': contact_details.contact,
+                'email': contact_details.email,
                 'id':id,
                 'device_id':device_auth,
             }

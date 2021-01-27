@@ -22,7 +22,7 @@ class NotesTrackerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MasterNotes
-        fields = ('id','Description','downloads','Mapped_Key','Auth_key')
+        fields = ('id','owner','file_snippet','Description','author','downloads','Mapped_Key','Auth_key')
 
     def get_Auth_key(self,request):
       Device_key = self.context.get("Device_key")

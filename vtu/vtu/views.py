@@ -25,25 +25,25 @@ class InitialLoad(APIView):
      if len(device_auth) != 16:
        return Response({"ERROR":"Access Denied"}, status=status.HTTP_404_NOT_FOUND)
      if DeviceAuth.objects.filter(device_key=device_auth).exists():
-        app_version = AppVersion.objects.all()
-        app_force_update = AppForceUpdateRequired.objects.all()
-        mapped_key = DeviceAuth.objects.filter(device_key = device_auth)
-        print(mapped_key[0].updated_on)
-        return Response({"Auth_key":mapped_key[0].mapped_key,
-                        "app_version":app_version[0].version,
-                        "app_force_update":app_force_update[0].force_update_required,
+        app_version = AppVersion.objects.filter(id=1).first()
+        app_force_update = AppForceUpdateRequired.objects.filter(id=1).first()
+        mapped_key = DeviceAuth.objects.filter(device_key = device_auth).first()
+        print(mapped_key.updated_on)
+        return Response({"Auth_key":mapped_key.mapped_key,
+                        "app_version":app_version.version,
+                        "app_force_update":app_force_update.force_update_required,
                         "user_type_old":"OLD_USER"}, status=status.HTTP_200_OK)
      else:
          mapped_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
          new_data = DeviceAuth(device_key=device_auth, mapped_key=mapped_id)
          new_data.save()
-         app_version = AppVersion.objects.all()
-         app_force_update = AppForceUpdateRequired.objects.all()
-         mapped_key = DeviceAuth.objects.filter(device_key = device_auth)
-         print(mapped_key[0].updated_on)
-         return Response({"Auth_key":mapped_key[0].mapped_key,
-                        "app_version":app_version[0].version,
-                        "app_force_update":app_force_update[0].force_update_required,
+         app_version = AppVersion.objects.filter(id=1).first()
+         app_force_update = AppForceUpdateRequired.objects.filter(id=1).first()
+         mapped_key = DeviceAuth.objects.filter(device_key = device_auth).first()
+         #print(mapped_key.updated_on)
+         return Response({"Auth_key":mapped_key.mapped_key,
+                        "app_version":app_version.version,
+                        "app_force_update":app_force_update.force_update_required,
                         "user_type_new":"NEW_USER"}, status=status.HTTP_200_OK)
 
 
@@ -105,7 +105,8 @@ class FetchMasterList(APIView):
       return Response(serializer)
     else:
       return Response({"ERROR":"Access Denied"}, status=status.HTTP_404_NOT_FOUND)
-      
+
+
 class FetchSubject(APIView):
 
   def get(self, request, sem, branch, device_auth, format=None):
@@ -174,20 +175,22 @@ class TrackDownloads(APIView):
         if AuthRequired(device_auth) == True:
             mapped_key = DeviceAuth.objects.filter(device_key=device_auth)
             if type == 'Notes':
-                MonetizeNotes(id)
                 if TrackNotesDownlods.objects.filter(device_id=device_auth, notes_id=id).exists():
-                    data = TrackNotesDownlods.objects.filter(device_id=device_auth, notes_id=id)
-                    if data[0].date == date.today() and data[0].download_count < 10:
+                    data = TrackNotesDownlods.objects.filter(device_id=device_auth, notes_id=id).first()
+                    if data.date == date.today() and data.download_count < 10:
                         MasterNotes.objects.filter(id=id).update(downloads=F('downloads') + 1)
                         TrackNotesDownlods.objects.filter(notes_id=id,device_id=device_auth ).update(download_count=F('download_count') + 1)
-                    elif data[0].date != date.today():
+                        MonetizeNotes(id)
+                    elif data.date != date.today():
                         TrackNotesDownlods.objects.filter(notes_id=id, device_id=device_auth ).update(date=date.today())
                         TrackNotesDownlods.objects.filter(notes_id=id,device_id=device_auth ).update(download_count=1)
                         MasterNotes.objects.filter(id=id).update(downloads=F('downloads') + 1)
+                        MonetizeNotes(id)
                 else:
                     tracker = TrackNotesDownlods(device_id=device_auth, notes_id=id,download_count = 1,date = date.today() )
                     tracker.save()
                     MasterNotes.objects.filter(id=id).update(downloads=F('downloads') + 1)
+                    MonetizeNotes(id)
                 return Response({"status":"O.K"}, status=status.HTTP_200_OK)
             elif type == 'Qpaper':
                 MasterQuestionPapers.objects.filter(id=id).update(downloads=F('downloads') + 1)
@@ -205,7 +208,6 @@ class TrackDownloads(APIView):
 
 class FeedBack(APIView):
     def post(self, request, format=None):
-
         if AuthRequired(request.data['device_id']) == True:
             serializer = FeedBackSerializer(data=request.data)
             if serializer.is_valid():
@@ -246,8 +248,8 @@ class ContactUS(APIView):
     def post(self, request, format=None):
         if AuthRequired(request.data['device_id']) == True:
             if ContactUs.objects.filter(device_id = request.data['device_id']).exists():
-                old_contact_data = ContactUs.objects.filter(device_id = request.data['device_id'])
-                if old_contact_data[0].email != request.data['email']:
+                old_contact_data = ContactUs.objects.filter(device_id = request.data['device_id']).first()
+                if old_contact_data.email != request.data['email']:
                     ContactUs.objects.filter(device_id=request.data['device_id']).update(user_verified = False)
                 ContactUs.objects.filter(device_id=request.data['device_id']).update(name=request.data['name'],
                                                                                      email=request.data['email'],
@@ -278,20 +280,20 @@ class ContactUS(APIView):
 class ValidateOTP(APIView):
     def get(self, request, otp, device_auth, format=None):
         if AuthRequired(device_auth) == True:
-            otp_inside = OTPValidate.objects.filter(device_id=device_auth)
-            if otp == str(otp_inside[0].otp):
-                ContactUs.objects.filter(device_id = device_auth, email = otp_inside[0].email).update(user_verified = True)
-                contact_details = ContactUs.objects.filter(device_id = device_auth, email = otp_inside[0].email)
-                link = 'http://34.219.72.32/UserNotesUpload/'+str(contact_details[0].id)+'/'+contact_details[0].device_id
+            otp_inside = OTPValidate.objects.filter(device_id=device_auth).first()
+            if otp == str(otp_inside.otp):
+                ContactUs.objects.filter(device_id = device_auth, email = otp_inside.email).update(user_verified = True)
+                contact_details = ContactUs.objects.filter(device_id = device_auth, email = otp_inside.email).first()
+                link = 'http://34.219.72.32/UserNotesUpload/'+str(contact_details.id)+'/'+contact_details.device_id
                 context = {
-                    'name':contact_details[0].name,
-                    'contact': contact_details[0].contact,
-                    'email':otp_inside[0].email,
-                    'message':contact_details[0].user_message,
+                    'name':contact_details.name,
+                    'contact': contact_details.contact,
+                    'email':otp_inside.email,
+                    'message':contact_details.user_message,
                     'link':link,
                 }
                 subject = 'Thanks for contacting us!'
-                mail_status = SendEmail(otp_inside[0].email, context, subject, 'ThanksForContactingUs.html')
+                mail_status = SendEmail(otp_inside.email, context, subject, 'ThanksForContactingUs.html')
                 if mail_status == False:
                     return Response({"ERROR": "OOPS! an internal error occured :("}, status=status.HTTP_404_NOT_FOUND)
                 subject = "Some user has contacted us!!!"
@@ -304,7 +306,7 @@ class ValidateOTP(APIView):
                     else:
                         return Response({"status": "O.K"}, status=status.HTTP_200_OK)
             else:
-                #ContactUs.objects.filter(device_id=device_auth, email=otp_inside[0].email).delete()
+                #ContactUs.objects.filter(device_id=device_auth, email=otp_inside.email).delete()
                 return Response({"status":"OTP not matching"}, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response({"ERROR": "Access Denied"}, status=status.HTTP_404_NOT_FOUND)
@@ -315,11 +317,11 @@ class NotesTracker(APIView):
             if type == 'OLD':
                 unique_id = email_uniqueid
                 if EmailUniqueidMapper.objects.filter(mapped_id = unique_id).exists():
-                    mappedData = EmailUniqueidMapper.objects.filter(mapped_id = unique_id)
+                    mappedData = EmailUniqueidMapper.objects.filter(mapped_id = unique_id).first()
                 else:
-                    return Response({"ERROR": "Type and Mapped Key not matching :("},
+                    return Response({"ERROR": "REAuth required :("},
                                     status=status.HTTP_404_NOT_FOUND)
-                email = mappedData[0].email
+                email = mappedData.email
                 TrackerRecords = namedtuple('TrackerRecords', ('NotesTrack', 'Earnings'))
                 Tracker = TrackerRecords(
                     NotesTrack=MasterNotes.objects.filter(owner_email = email),
@@ -351,11 +353,14 @@ class NotesTracker(APIView):
 class TrackerOTPValidater(APIView):
     def get(self, request, otp, email, device_auth, format=None):
         if AuthRequired(device_auth) == True:
-            otp_inside = TrackerOTPValidate.objects.filter(email=email)
-            if otp == str(otp_inside[0].otp):
+            otp_inside = TrackerOTPValidate.objects.filter(email=email).first()
+            if otp == str(otp_inside.otp):
                 mapped_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
-                mappedData = EmailUniqueidMapper(mapped_id=mapped_id, email=email)
-                mappedData.save()
+                if EmailUniqueidMapper.objects.filter(email = email).exists():
+                    EmailUniqueidMapper.objects.filter(email=email).update(mapped_id=mapped_id)
+                else:
+                    mappedData = EmailUniqueidMapper(mapped_id=mapped_id, email=email)
+                    mappedData.save()
                 TrackerRecords = namedtuple('TrackerRecords', ('NotesTrack', 'Earnings'))
                 Tracker = TrackerRecords(
                     NotesTrack=MasterNotes.objects.filter(owner_email=email),
@@ -367,7 +372,8 @@ class TrackerOTPValidater(APIView):
                 # serializer = TrackMasterSerializer(Tracker, context={'Device_key': device_auth}
                 # ).data
                 notesTrackerSerializer = TrackMasterSerializer(Tracker, context={'Device_key': device_auth,
-                                                                                 'Mapped_Key': mapped_id}).data
+                                                                                 'Mapped_Key': mapped_id,
+                                                                                 'Email': email}).data
                 return Response(notesTrackerSerializer, status=status.HTTP_200_OK)
             else:
                 return Response({"status": "OTP not matching"}, status=status.HTTP_403_FORBIDDEN)
