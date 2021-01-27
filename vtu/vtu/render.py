@@ -29,7 +29,7 @@ class Render:
     def render_to_file(path: str, params: dict):
         template = get_template(path)
         html = template.render(params)
-        file_name = "{0}-{1}.pdf".format(params['request'].user.first_name, randint(1, 1000000))
+        file_name = "{0}-{1}.pdf".format("VtuFreeNotes", randint(1, 1000000))
         #file_path1 = os.path.join(os.path.abspath(os.path.dirname("__file__")), "media", file_name)
         #print(file_path1)
         file_path2 = os.path.join(BASE_DIR,'media')
