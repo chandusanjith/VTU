@@ -13,7 +13,7 @@ from django.db.models import Count
 from django.db.models import F
 from .automaticmail import SendEmail
 from .OTPGenerator import GenerateOTP
-from .Autherizer import AuthRequired
+from .Autherizer import AuthRequired, LinkAutherizer
 from .monetize import MonetizeNotes
 from datetime import date
 import random
@@ -263,6 +263,23 @@ class ContactUS(APIView):
                         return Response({"ERROR": "OOPS! an internal error occured :("},
                                             status=status.HTTP_404_NOT_FOUND)
                 else:
+                    contact_details = ContactUs.objects.filter(device_id=request.data['device_id'], email=request.data['email'],user_verified = True).first()
+                    link_mapper = LinkAutherizer(request.data['email'])
+                    link = 'http://127.0.0.1:8000/UserNotesUpload/' + str(
+                        contact_details.id) + '/' + contact_details.device_id + '/' + link_mapper
+                    context = {
+                        'name': contact_details.name,
+                        'contact': contact_details.contact,
+                        'email': request.data['email'],
+                        'message': contact_details.user_message,
+                        'link': link,
+                    }
+                    print(link)
+                    subject = 'Thanks for contacting us!'
+                    mail_status = SendEmail(request.data['email'], context, subject, 'ThanksForContactingUs.html')
+                    if mail_status == False:
+                        return Response({"ERROR": "OOPS! an internal error occured :("},
+                                        status=status.HTTP_404_NOT_FOUND)
                     return Response({"status": "User has been verified, no need of otp validation"}, status=status.HTTP_200_OK)
             else:
                 serializer = ContactUsSerializer(data=request.data)
@@ -283,8 +300,9 @@ class ValidateOTP(APIView):
             otp_inside = OTPValidate.objects.filter(device_id=device_auth).first()
             if otp == str(otp_inside.otp):
                 ContactUs.objects.filter(device_id = device_auth, email = otp_inside.email).update(user_verified = True)
-                contact_details = ContactUs.objects.filter(device_id = device_auth, email = otp_inside.email).first()
-                link = 'http://34.219.72.32/UserNotesUpload/'+str(contact_details.id)+'/'+contact_details.device_id
+                contact_details = ContactUs.objects.filter(device_id = device_auth, email = otp_inside.email,user_verified = True).first()
+                link_mapper=LinkAutherizer(otp_inside.email)
+                link = 'http://34.219.72.32/UserNotesUpload/'+str(contact_details.id)+'/'+contact_details.device_id+'/'+link_mapper
                 context = {
                     'name':contact_details.name,
                     'contact': contact_details.contact,

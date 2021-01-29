@@ -17,7 +17,8 @@ class MasterNotesAdmin(admin.ModelAdmin):
         ('subject', admin.RelatedOnlyFieldListFilter),
     )
 
-
+admin.site.register(GLAccount)
+admin.site.register(GLPassBook)
 admin.site.register(EmailUniqueidMapper)
 admin.site.register(PaymentPassBook)
 #admin.site.register(MasterNotes)

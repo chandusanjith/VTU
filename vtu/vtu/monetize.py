@@ -27,6 +27,12 @@ class RedeemAmount(APIView):
             amtData = UserMoneyBucket.objects.filter(email=email).first()
             earnedAmount = amtData.totAmountEarned
             redeemedAmount = amtData.totAmountRedeemed
+            GLbalance = GLAccount.objects.filter(id=1).first()
+            GLAccount.objects.filter(id=1).update(balance=GLbalance.balance - earnedAmount)
+            narration = 'Paid to ' + email
+            glpass = GLPassBook(account=GLbalance.account, credit=0, debit=earnedAmount,
+                                currBalance=GLbalance.balance-earnedAmount, narration=narration)
+            glpass.save()
             UserMoneyBucket.objects.filter(email=email).update(totAmountEarned=0, totAmountRedeemed=earnedAmount+redeemedAmount)
             narration = "Self Redeemed"
             passbook = PaymentPassBook(email=email, credit=0, debit=earnedAmount,

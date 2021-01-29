@@ -44,13 +44,14 @@ urlpatterns = [
     path('apiv1/TrackerOTP/<otp>/<email>/<device_auth>', views.TrackerOTPValidater.as_view()),
     path('apiv1/Redeem/<mapped_key>/<device_auth>', monetize.RedeemAmount.as_view()),
     path('apiv1/Statement/<mapped_key>/<device_auth>', monetize.GenerateStatements.as_view()),
+    #path('apiv1/ShowBills/<mapped_key>/<device_auth>', monetize.ShowBills.as_view()),
     # API ENDS HERE
     #TEMPLATE RENDERING STARTS HERE
     path('Dashboard', template_views.LoadDashBoard),
     path('PrivacyPolicy', template_views.LoadPrivacyPolicy),
     path('Terms', template_views.LoadTerms),
     path('AboutUS', template_views.LoadAboutus),
-    path('UserNotesUpload/<id>/<device_auth>', template_views.UserNotesUpload),
+    path('UserNotesUpload/<id>/<device_auth>/<link_mapper>', template_views.UserNotesUpload),
     path('ThankYou/',template_views.ThankYou ),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)

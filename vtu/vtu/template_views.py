@@ -4,16 +4,18 @@ from django.shortcuts import render
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.db.models.functions import ExtractMonth
-from .Autherizer import AuthRequired
+from .Autherizer import AuthRequired,AuthLink
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core.exceptions import PermissionDenied
+
+
+
 
 
 def LoadDashBoard(request):
     #dat = DeviceAuth.objects.annotate(month=TruncMonth('updated_on')).values('month').annotate(c=Count('device_key')).values('month', 'c')
     #dat = DeviceAuth.objects.all()
     dat = DeviceAuth.objects.all().extra({'date_created': "date(updated_on)"}).values('updated_on').annotate(created_count=Count('device_key'))
-    print(dat)
     authors_data = MasterAbout.objects.all()
     notes_count = MasterNotes.objects.all().count()
     qpaper_count = MasterQuestionPapers.objects.all().count()
@@ -51,27 +53,31 @@ def LoadTerms(request):
     return render(request, 'Terms_of_use.html')
 def ThankYou(request):
     return render(request,'ThankYou.html')
-def UserNotesUpload(request, id, device_auth):
+def UserNotesUpload(request, id, device_auth, link_mapper):
     if AuthRequired(device_auth) == True:
-        if request.method == "GET":
-            contact_details = ContactUs.objects.filter(id=id).first()
-            context = {
-                'name': contact_details.name,
-                'contact': contact_details.contact,
-                'email': contact_details.email,
-                'id':id,
-                'device_id':device_auth,
-            }
-            return render(request, 'userNotesUpload.html', context)
+        contact_details = ContactUs.objects.filter(id=id).first()
+        if AuthLink(contact_details.email,link_mapper) == True:
+            if request.method == "GET":
+                #contact_details = ContactUs.objects.filter(id=id).first()
+                context = {
+                    'name': contact_details.name,
+                    'contact': contact_details.contact,
+                    'email': contact_details.email,
+                    'id':id,
+                    'device_id':device_auth,
+                }
+                return render(request, 'userNotesUpload.html', context)
+            else:
+                name = request.POST['name']
+                Description = request.POST['Description']
+                notes = request.FILES["upnotes"]
+                address = request.POST['address']
+                email = request.POST['email']
+                contact = request.POST['cnum']
+                a = NewNotes(Description = Description,device_id = device_auth, notes = notes, name = name, email = email, contact = contact, address = address)
+                a.save()
+                return HttpResponseRedirect('/ThankYou/')
         else:
-            name = request.POST['name']
-            Description = request.POST['Description']
-            notes = request.FILES["upnotes"]
-            address = request.POST['address']
-            email = request.POST['email']
-            contact = request.POST['cnum']
-            a = NewNotes(Description = Description,device_id = device_auth, notes = notes, name = name, email = email, contact = contact, address = address)
-            a.save()
-            return HttpResponseRedirect('/ThankYou/')
+            return render(request, 'ReRegister.html')
     else:
         raise PermissionDenied

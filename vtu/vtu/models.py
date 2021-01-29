@@ -217,6 +217,8 @@ class NewNotes(models.Model):
 class EmailUniqueidMapper(models.Model):
   email = models.CharField(max_length=40, default=" ")
   mapped_id = models.CharField(max_length=16, default=" ")
+  link_mapper = models.CharField(max_length=16, default=" ")
+  link_expiry = models.DateField()
 
   def __str__(self):
     return self.email + '-' + self.mapped_id
@@ -250,6 +252,19 @@ class UserMoneyBucket(models.Model):
 
 class PaymentPassBook(models.Model):
   email = models.CharField(max_length=40, default=" ")
+  credit = models.DecimalField(max_digits=12, decimal_places=2)
+  debit = models.DecimalField(max_digits=12, decimal_places=2)
+  currBalance = models.DecimalField(max_digits=12, decimal_places=2)
+  narration = models.CharField(max_length=400, default=" ")
+  tranDate = models.DateField(auto_now_add=True)
+
+class GLAccount(models.Model):
+  account = models.CharField(max_length=40, default=" ")
+  balance = models.DecimalField(max_digits=12, decimal_places=2)
+  updated_on = models.DateField(auto_now_add=True)
+
+class GLPassBook(models.Model):
+  account = models.CharField(max_length=40, default=" ")
   credit = models.DecimalField(max_digits=12, decimal_places=2)
   debit = models.DecimalField(max_digits=12, decimal_places=2)
   currBalance = models.DecimalField(max_digits=12, decimal_places=2)
