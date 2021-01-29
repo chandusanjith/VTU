@@ -28,6 +28,9 @@ class RedeemAmount(APIView):
             earnedAmount = amtData.totAmountEarned
             redeemedAmount = amtData.totAmountRedeemed
             GLbalance = GLAccount.objects.filter(id=1).first()
+            if GLbalance.balance < earnedAmount:
+                return Response({"ERROR": "OOPS! GL Balance is less than requested amount. :("},
+                                status=status.HTTP_404_NOT_FOUND)
             GLAccount.objects.filter(id=1).update(balance=GLbalance.balance - earnedAmount)
             narration = 'Paid to ' + email
             glpass = GLPassBook(account=GLbalance.account, credit=0, debit=earnedAmount,
