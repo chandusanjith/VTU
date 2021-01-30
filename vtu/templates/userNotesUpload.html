@@ -22,7 +22,7 @@
                     <img src="{% static 'images/signup-img.jpg' %}" alt="">
                 </div>
                 <div class="signup-form">
-                    <form action = "/UserNotesUpload/{{id}}/{{device_id}}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                    <form action = "/UserNotesUpload/{{id}}/{{device_id}}/{{mapped_id}}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
                         <h2>Notes Upload Form</h2>
                         <div class="form-row">
                             <div class="form-group">

@@ -65,6 +65,7 @@ def UserNotesUpload(request, id, device_auth, link_mapper):
                     'email': contact_details.email,
                     'id':id,
                     'device_id':device_auth,
+                    'mapped_id':link_mapper,
                 }
                 return render(request, 'userNotesUpload.html', context)
             else:
