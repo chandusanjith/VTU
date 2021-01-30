@@ -41,7 +41,7 @@ class RedeemAmount(APIView):
             passbook = PaymentPassBook(email=email, credit=0, debit=earnedAmount,
                                        currBalance=amtData.totAmountEarned, narration=narration)
             passbook.save()
-            contact_details = ContactUs.objects.filter(device_id=device_auth, email=email).first()
+            contact_details = ContactUs.objects.filter(email=email, user_verified=True).first()
             context = {
                 'amount': earnedAmount,
                 'contact': contact_details.contact,
