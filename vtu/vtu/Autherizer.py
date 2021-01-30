@@ -14,14 +14,15 @@ def AuthRequired(auth_key):
     return False
 
 def LinkAutherizer(email):
+  link_expiry = date.today() + timedelta(days=2)
+  link_mapper = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
   if EmailUniqueidMapper.objects.filter(email=email).exists():
-    #data = EmailUniqueidMapper.objects.filter(email=email).first()
-    link_expiry = date.today() + timedelta(days=2)
-    link_mapper = ''.join(random.choices(string.ascii_lowercase + string.digits, k=16))
     EmailUniqueidMapper.objects.filter(email=email).update(link_mapper=link_mapper,link_expiry=link_expiry)
     return link_mapper
   else:
-    return Response({"ERROR": "Error occured at LinkAutherizer"}, status=status.HTTP_404_NOT_FOUND)
+    data=EmailUniqueidMapper(email=email,mapped_id=link_mapper,link_mapper=link_mapper,link_expiry= link_expiry)
+    data.save()
+    return link_mapper
 
 def AuthLink(email,link_mapper):
   if EmailUniqueidMapper.objects.filter(link_mapper=link_mapper, email=email).exists():

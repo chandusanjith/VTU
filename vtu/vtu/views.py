@@ -356,6 +356,11 @@ class NotesTracker(APIView):
                 return Response(notesTrackerSerializer, status=status.HTTP_200_OK)
             elif type == "NEW":
                 email = email_uniqueid
+                #if ContactUs.object.filter(email = email,user_verified=True).exists():
+                #    pass
+                #else:
+                #    return Response({"ERROR": "OOPS! kindly upload notes first to enable this feature"},
+                #                    status=status.HTTP_404_NOT_FOUND)
                 response = GenerateOTP(device_auth, email, "user", "N")
                 if response == True:
                     return Response({"status": "OTP has been shared"}, status=status.HTTP_200_OK)
@@ -377,7 +382,7 @@ class TrackerOTPValidater(APIView):
                 if EmailUniqueidMapper.objects.filter(email = email).exists():
                     EmailUniqueidMapper.objects.filter(email=email).update(mapped_id=mapped_id)
                 else:
-                    mappedData = EmailUniqueidMapper(mapped_id=mapped_id, email=email)
+                    mappedData = EmailUniqueidMapper(mapped_id=mapped_id, email=email, link_mapper=mapped_id, link_expiry=date.today())
                     mappedData.save()
                 TrackerRecords = namedtuple('TrackerRecords', ('NotesTrack', 'Earnings'))
                 Tracker = TrackerRecords(
