@@ -138,8 +138,6 @@ def FetchSubjects(request):
     html = render_to_string('SubDropDown.html', context, request=request)
     return JsonResponse({'form': html})
 
-
-
 def ApproveNotes(request, id):
     namesel = request.POST['namesel']
     emailsel = request.POST['emailsel']
