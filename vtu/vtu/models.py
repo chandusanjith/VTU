@@ -210,6 +210,9 @@ class NewNotes(models.Model):
   contact = models.CharField(max_length=15, default=" ")
   address = models.CharField(max_length=240, default=" ")
   Description = models.CharField(max_length=240, default=" ")
+  subjectID = models.CharField(max_length=240, default=" ")
+  approved = models.BooleanField(default=False)
+
 
   def __str__(self):
     return self.name

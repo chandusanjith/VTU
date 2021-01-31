@@ -7,7 +7,7 @@ from django.db.models.functions import ExtractMonth
 from .Autherizer import AuthRequired,AuthLink
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core.exceptions import PermissionDenied
-
+from django.contrib.auth.models import User, auth
 
 
 
@@ -82,3 +82,42 @@ def UserNotesUpload(request, id, device_auth, link_mapper):
             return render(request, 'ReRegister.html')
     else:
         raise PermissionDenied
+
+
+def NotesLogin(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return HttpResponseRedirect('/NotesMain/')
+        else:
+           return render(request, 'NotesLogin.html')
+    else:
+        uid = request.POST["uname"]
+        password = request.POST["psw"]
+        user = auth.authenticate(username=uid, password=password)
+
+        if user is not None:
+            auth.login(request, user)
+            return HttpResponseRedirect('/NotesMain/')
+        else:
+            return HttpResponseRedirect('/NotesLogin/')
+
+def NotesMain(request):
+    newNotes = NewNotes.objects.filter(approved=False)
+    context = {
+        'newNotes':newNotes,
+    }
+    return render(request, 'NotesMain.html', context)
+
+
+
+def NotesApprove(request, id):
+    if request.method == "GET":
+        newNotes = NewNotes.objects.filter(id=id).first()
+        branches = MasterBranches.objects.all()
+        semester = MasterSemesters.objects.all()
+        context = {
+            'newNotes': newNotes,
+            'branches':branches,
+            'semester':semester,
+        }
+        return render(request, 'NotesApprove.html', context)

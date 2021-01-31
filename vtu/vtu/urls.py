@@ -53,5 +53,8 @@ urlpatterns = [
     path('AboutUS', template_views.LoadAboutus),
     path('UserNotesUpload/<id>/<device_auth>/<link_mapper>', template_views.UserNotesUpload),
     path('ThankYou/',template_views.ThankYou ),
+    path('NotesLogin/', template_views.NotesLogin),
+    path('NotesMain/', template_views.NotesMain),
+    path('NoteApprove/<id>/', template_views.NotesApprove),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)
