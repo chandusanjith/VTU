@@ -56,5 +56,7 @@ urlpatterns = [
     path('NotesLogin/', template_views.NotesLogin),
     path('NotesMain/', template_views.NotesMain),
     path('NoteApprove/<id>/', template_views.NotesApprove),
+    path('FetchSub/', template_views.FetchSubjects),
+    path('ApproveNotes/<id>', template_views.ApproveNotes),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns = format_suffix_patterns(urlpatterns)

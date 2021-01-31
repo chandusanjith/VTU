@@ -1,0 +1,9 @@
+        <div class="form-group">
+      <label for="disabledSub">select sub</label>
+           <select id="disabledSub" class="form-control" name="subjectsel">
+        {% for sub in subjects %}
+        <option>{{sub.subject_name}}</option>
+               {% endfor %}
+           </select>
+    </div>
+       <button id="fetchsub" type="submit" class="btn btn-primary">Fetch Sub</button>

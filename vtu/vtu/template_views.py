@@ -8,7 +8,8 @@ from .Autherizer import AuthRequired,AuthLink
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User, auth
-
+from django.template.loader import render_to_string
+from django.contrib.auth.models import User
 
 
 
@@ -75,7 +76,8 @@ def UserNotesUpload(request, id, device_auth, link_mapper):
                 address = request.POST['address']
                 email = request.POST['email']
                 contact = request.POST['cnum']
-                a = NewNotes(Description = Description,device_id = device_auth, notes = notes, name = name, email = email, contact = contact, address = address)
+                subcode= request.POST['SubCode']
+                a = NewNotes(subjectID=subcode,Description = Description,device_id = device_auth, notes = notes, name = name, email = email, contact = contact, address = address)
                 a.save()
                 return HttpResponseRedirect('/ThankYou/')
         else:
@@ -115,9 +117,39 @@ def NotesApprove(request, id):
         newNotes = NewNotes.objects.filter(id=id).first()
         branches = MasterBranches.objects.all()
         semester = MasterSemesters.objects.all()
+        subjects = MasterSubjects.objects.all()
         context = {
             'newNotes': newNotes,
             'branches':branches,
             'semester':semester,
+            'subjects': subjects,
         }
         return render(request, 'NotesApprove.html', context)
+
+def FetchSubjects(request):
+    #branch = request.POST['branchs']
+    branch = MasterBranches.objects.filter(branch_name=request.POST['branchs']).first()
+    #semester = request.POST['sems']
+    semester = MasterSemesters.objects.filter(sem_name=request.POST['sems']).first()
+    subjects = MasterSubjects.objects.filter(subject_branch = branch, subject_semester=semester)
+    context = {
+        'subjects':subjects,
+    }
+    html = render_to_string('SubDropDown.html', context, request=request)
+    return JsonResponse({'form': html})
+
+
+
+def ApproveNotes(request, id):
+    namesel = request.POST['namesel']
+    emailsel = request.POST['emailsel']
+    descriptionsel = request.POST['descriptionsel']
+    notesfile = NewNotes.objects.filter(id=id).first()
+    branch = MasterBranches.objects.filter(branch_name=request.POST['branchsel']).first()
+    user = User.objects.get(id=1)
+    semester = MasterSemesters.objects.filter(sem_name=request.POST['semestersel']).first()
+    subject = MasterSubjects.objects.filter(subject_name=request.POST['subjectsel']).first()
+    master = MasterNotes(owner=user, owner_email=emailsel,semester=semester, branch=branch, author=namesel,subject=subject, file=notesfile.notes,Description= descriptionsel)
+    master.save()
+    NewNotes.objects.filter(id=id).update(approved=True)
+    return HttpResponseRedirect('/NotesMain/')
