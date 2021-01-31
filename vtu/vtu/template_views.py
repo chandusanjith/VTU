@@ -110,8 +110,6 @@ def NotesMain(request):
     }
     return render(request, 'NotesMain.html', context)
 
-
-
 def NotesApprove(request, id):
     if request.method == "GET":
         newNotes = NewNotes.objects.filter(id=id).first()
