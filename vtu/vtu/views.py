@@ -265,7 +265,7 @@ class ContactUS(APIView):
                 else:
                     contact_details = ContactUs.objects.filter(device_id=request.data['device_id'], email=request.data['email'],user_verified = True).first()
                     link_mapper = LinkAutherizer(request.data['email'])
-                    link = 'http://127.0.0.1:8000/UserNotesUpload/' + str(
+                    link = 'http://34.219.72.32/UserNotesUpload/' + str(
                         contact_details.id) + '/' + contact_details.device_id + '/' + link_mapper
                     context = {
                         'name': contact_details.name,
